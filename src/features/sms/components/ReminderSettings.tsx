@@ -34,7 +34,7 @@ export function ReminderSettings({
   const [error, setError] = useState<string | null>(null)
 
   // Form state for new schedule
-  const [newTiming, setNewTiming] = useState<ReminderTiming>('day')
+  const [newTiming, setNewTiming] = useState<ReminderTiming>('1_day')
   const [newTemplateId, setNewTemplateId] = useState<string>('')
 
   const handleToggleSchedule = async (scheduleId: string, enabled: boolean) => {
@@ -149,7 +149,7 @@ export function ReminderSettings({
         <CardHeader>
           <CardTitle>Reminder Schedule</CardTitle>
           <CardDescription>
-            Choose when reminders should be sent before appointments
+            Reminders are sent daily at 8:00 AM. Choose which reminders to enable.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -174,8 +174,11 @@ export function ReminderSettings({
                       <Badge variant="secondary">Disabled</Badge>
                     )}
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    {REMINDER_TIMINGS[schedule.timing]?.description}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    Using template: {getTemplateName(schedule.templateId)}
+                    Template: {getTemplateName(schedule.templateId)}
                   </p>
                 </div>
                 <div className="flex gap-2">

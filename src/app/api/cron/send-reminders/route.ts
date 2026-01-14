@@ -4,7 +4,7 @@ import { sendSMS } from '@/lib/twilio/client'
 import { createSMSLog } from '@/features/sms/server/sms-log-service'
 import { interpolateTemplate } from '@/features/templates/types'
 import { REMINDER_TIMINGS, type ReminderTiming } from '@/features/sms/types'
-import { format } from 'date-fns'
+import { format, startOfDay, endOfDay, addDays } from 'date-fns'
 
 // Verify cron secret to prevent unauthorized access
 const CRON_SECRET = process.env.CRON_SECRET
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  console.log('Starting reminder cron job...')
+  console.log('Starting daily reminder cron job...')
 
   try {
     const now = new Date()
@@ -50,6 +50,12 @@ export async function GET(request: NextRequest) {
       }
       const user = userDoc.data()!
 
+      // Check if trial user has credits
+      if (user.subscriptionStatus === 'trial' && user.smsCreditsRemaining <= 0) {
+        console.log(`User ${userId} has no SMS credits remaining, skipping`)
+        continue
+      }
+
       // Get the template
       const templateDoc = await getAdminDb().collection('templates').doc(templateId).get()
       if (!templateDoc.exists) {
@@ -58,23 +64,24 @@ export async function GET(request: NextRequest) {
       }
       const template = templateDoc.data()!
 
-      // Calculate the time window for this reminder timing
-      const minutesBefore = REMINDER_TIMINGS[timing]?.minutes || 0
-      const windowStart = new Date(now.getTime() + (minutesBefore - 5) * 60 * 1000)
-      const windowEnd = new Date(now.getTime() + (minutesBefore + 5) * 60 * 1000)
+      // Calculate the target date based on timing
+      const daysAhead = REMINDER_TIMINGS[timing]?.daysAhead ?? 1
+      const targetDate = addDays(now, daysAhead)
+      const dayStart = startOfDay(targetDate)
+      const dayEnd = endOfDay(targetDate)
 
       console.log(`Checking ${timing} reminders for user ${userId}`)
-      console.log(`Window: ${windowStart.toISOString()} to ${windowEnd.toISOString()}`)
+      console.log(`Target date: ${format(targetDate, 'yyyy-MM-dd')} (${daysAhead} days ahead)`)
 
-      // Get appointments in the reminder window
+      // Get appointments on the target date
       const appointmentsSnapshot = await getAdminDb()
         .collection('appointments')
         .where('userId', '==', userId)
-        .where('appointmentTime', '>=', windowStart)
-        .where('appointmentTime', '<=', windowEnd)
+        .where('appointmentTime', '>=', dayStart)
+        .where('appointmentTime', '<=', dayEnd)
         .get()
 
-      console.log(`Found ${appointmentsSnapshot.size} appointments in window`)
+      console.log(`Found ${appointmentsSnapshot.size} appointments on target date`)
 
       for (const appointmentDoc of appointmentsSnapshot.docs) {
         results.checked++
@@ -99,6 +106,14 @@ export async function GET(request: NextRequest) {
           console.log(`Skipping appointment ${appointmentDoc.id}: reminder already sent`)
           results.skipped++
           continue
+        }
+
+        // Re-check user credits (may have been decremented in this loop)
+        const currentUserDoc = await getAdminDb().collection('users').doc(userId).get()
+        const currentUser = currentUserDoc.data()!
+        if (currentUser.subscriptionStatus === 'trial' && currentUser.smsCreditsRemaining <= 0) {
+          console.log(`User ${userId} ran out of credits during batch, stopping`)
+          break
         }
 
         // Interpolate the template
@@ -136,9 +151,9 @@ export async function GET(request: NextRequest) {
           console.log(`Reminder sent successfully: ${result.sid}`)
 
           // Decrement SMS credits for trial users
-          if (user.subscriptionStatus === 'trial' && user.smsCreditsRemaining > 0) {
+          if (currentUser.subscriptionStatus === 'trial' && currentUser.smsCreditsRemaining > 0) {
             await getAdminDb().collection('users').doc(userId).update({
-              smsCreditsRemaining: user.smsCreditsRemaining - 1,
+              smsCreditsRemaining: currentUser.smsCreditsRemaining - 1,
             })
           }
         } else {
@@ -148,7 +163,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log('Cron job completed:', results)
+    console.log('Daily cron job completed:', results)
 
     return NextResponse.json({
       success: true,

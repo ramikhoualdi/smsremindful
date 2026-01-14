@@ -42,17 +42,17 @@ export type UpdateTemplateInput = z.infer<typeof updateTemplateSchema>
 // Default templates - include opt-out text for A2P 10DLC compliance
 export const DEFAULT_TEMPLATES: Omit<Template, 'id' | 'userId' | 'createdAt' | 'updatedAt'>[] = [
   {
-    name: 'Appointment Reminder - 1 Day',
+    name: 'Appointment Reminder - 1 Day Before',
     content: 'SMS Remindful: Hi {{patientName}}, this is a reminder of your appointment tomorrow at {{appointmentTime}} with {{clinicName}}. Please call {{clinicPhone}} if you need to reschedule. Reply STOP to opt out.',
     isDefault: true,
   },
   {
-    name: 'Appointment Reminder - 1 Hour',
-    content: 'SMS Remindful: Hi {{patientName}}, friendly reminder - your appointment at {{clinicName}} is in 1 hour at {{appointmentTime}}. Please arrive a few minutes early. Reply STOP to opt out.',
+    name: 'Appointment Reminder - Same Day',
+    content: 'SMS Remindful: Hi {{patientName}}, reminder - your appointment at {{clinicName}} is TODAY at {{appointmentTime}}. Please arrive a few minutes early. Reply STOP to opt out.',
     isDefault: false,
   },
   {
-    name: 'Appointment Reminder - 1 Week',
+    name: 'Appointment Reminder - 1 Week Before',
     content: 'SMS Remindful: Hi {{patientName}}, reminder of your upcoming appointment on {{appointmentDate}} at {{appointmentTime}} with {{clinicName}}. Reply STOP to opt out.',
     isDefault: false,
   },
