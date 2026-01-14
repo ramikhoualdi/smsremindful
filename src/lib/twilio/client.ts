@@ -52,22 +52,22 @@ export async function sendSMS({ to, body, statusCallback }: SendSMSOptions): Pro
       throw new Error('Either TWILIO_MESSAGING_SERVICE_SID or TWILIO_PHONE_NUMBER must be configured')
     }
 
-    const messageOptions: Record<string, string> = {
-      body,
-      to,
-    }
-
+    let message
     if (messagingServiceSid) {
-      messageOptions.messagingServiceSid = messagingServiceSid
-    } else if (fromNumber) {
-      messageOptions.from = fromNumber
+      message = await client.messages.create({
+        body,
+        to,
+        messagingServiceSid,
+        statusCallback,
+      })
+    } else {
+      message = await client.messages.create({
+        body,
+        to,
+        from: fromNumber!,
+        statusCallback,
+      })
     }
-
-    if (statusCallback) {
-      messageOptions.statusCallback = statusCallback
-    }
-
-    const message = await client.messages.create(messageOptions)
 
     return {
       success: true,

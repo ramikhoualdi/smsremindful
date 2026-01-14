@@ -32,7 +32,8 @@ export async function getSMSLogsByAppointmentId(
 export async function createSMSLog(data: CreateSMSLogInput): Promise<SMSLog> {
   const now = new Date()
 
-  const logData = {
+  // Build Firestore data (use null for missing values)
+  const firestoreData: Record<string, unknown> = {
     userId: data.userId,
     appointmentId: data.appointmentId,
     templateId: data.templateId || null,
@@ -47,12 +48,24 @@ export async function createSMSLog(data: CreateSMSLogInput): Promise<SMSLog> {
     createdAt: now,
   }
 
-  const docRef = await getAdminDb().collection(SMS_LOGS_COLLECTION).add(logData)
+  const docRef = await getAdminDb().collection(SMS_LOGS_COLLECTION).add(firestoreData)
 
+  // Return typed SMSLog (use undefined for optional fields)
   return {
     id: docRef.id,
-    ...logData,
-  } as SMSLog
+    userId: data.userId,
+    appointmentId: data.appointmentId,
+    templateId: data.templateId,
+    phoneNumber: data.phoneNumber,
+    message: data.message,
+    status: data.status,
+    twilioSid: data.twilioSid,
+    error: data.error,
+    scheduledFor: data.scheduledFor,
+    sentAt: data.sentAt,
+    deliveredAt: undefined,
+    createdAt: now,
+  }
 }
 
 export async function updateSMSLogStatus(
