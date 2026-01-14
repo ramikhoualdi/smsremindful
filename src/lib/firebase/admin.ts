@@ -30,8 +30,20 @@ function getAdminApp(): App {
     }
     // Option 2: Individual env vars (recommended for Vercel)
     else if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
-      // Replace escaped newlines with actual newlines in private key
-      const privateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+      // Handle various ways the private key might be formatted
+      let privateKey = process.env.FIREBASE_PRIVATE_KEY
+
+      // If it contains literal \n (as two characters), replace with actual newlines
+      if (privateKey.includes('\\n')) {
+        privateKey = privateKey.replace(/\\n/g, '\n')
+      }
+      // If it doesn't have any newlines at all, it might be base64 or malformed
+      // Try to detect if BEGIN/END are on the same line and split properly
+      else if (!privateKey.includes('\n') && privateKey.includes('-----BEGIN')) {
+        privateKey = privateKey
+          .replace(/-----BEGIN PRIVATE KEY-----/, '-----BEGIN PRIVATE KEY-----\n')
+          .replace(/-----END PRIVATE KEY-----/, '\n-----END PRIVATE KEY-----\n')
+      }
 
       serviceAccountData = {
         type: 'service_account',
