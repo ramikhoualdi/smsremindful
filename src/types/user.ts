@@ -10,7 +10,7 @@ export const userSchema = z.object({
   clinicPhone: z.string().optional(),
   stripeCustomerId: z.string().optional(),
   subscriptionStatus: z.enum(['active', 'inactive', 'trial']).default('trial'),
-  subscriptionTier: z.enum(['starter', 'professional']).optional(),
+  subscriptionTier: z.enum(['solo', 'practice', 'clinic', 'custom']).optional(),
   trialStartedAt: z.date(),
   trialEndsAt: z.date(),
   smsCreditsRemaining: z.number().default(20),

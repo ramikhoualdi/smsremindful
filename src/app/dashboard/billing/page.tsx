@@ -1,10 +1,35 @@
+import { auth } from '@clerk/nextjs/server'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { getOrCreateUser } from '@/features/auth/server/user-service'
+import { currentUser } from '@clerk/nextjs/server'
+import { PRICING_PLANS } from '@/config/pricing'
+import { differenceInDays } from 'date-fns'
+import { ManageSubscriptionButton } from '@/features/billing/components/ManageSubscriptionButton'
 
-export default function BillingPage() {
-  // TODO: Fetch from Stripe
-  const smsCreditsRemaining = 20
+export default async function BillingPage() {
+  const { userId } = await auth()
+  const clerkUser = await currentUser()
+
+  if (!userId || !clerkUser) {
+    return null
+  }
+
+  const user = await getOrCreateUser(
+    userId,
+    clerkUser.emailAddresses[0]?.emailAddress || '',
+    clerkUser.fullName || clerkUser.firstName || ''
+  )
+
+  const trialDaysRemaining = user.trialEndsAt
+    ? Math.max(0, differenceInDays(user.trialEndsAt, new Date()))
+    : 0
+
+  const currentPlan = PRICING_PLANS.find((p) => p.id === user.subscriptionTier)
+  const isOnTrial = user.subscriptionStatus === 'trial'
+  const isActive = user.subscriptionStatus === 'active'
 
   return (
     <div className="space-y-6">
@@ -15,75 +40,56 @@ export default function BillingPage() {
         </p>
       </div>
 
+      {/* Current Plan Status */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Current Plan</CardTitle>
-            <Badge variant="secondary">Trial</Badge>
+            <Badge variant={isOnTrial ? 'secondary' : 'default'}>
+              {isOnTrial ? 'Trial' : isActive ? currentPlan?.name || 'Active' : 'Inactive'}
+            </Badge>
           </div>
           <CardDescription>
-            Your trial includes 7 days and 20 free SMS credits
+            {isOnTrial
+              ? 'Your trial includes 7 days and 20 free SMS credits'
+              : isActive
+                ? `You're on the ${currentPlan?.name} plan`
+                : 'Subscribe to continue using SMS Remindful'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">Trial Days Remaining</p>
-              <p className="text-2xl font-bold">7 days</p>
+              <p className="text-sm text-muted-foreground">
+                {isOnTrial ? 'Trial Days Remaining' : 'Plan Status'}
+              </p>
+              <p className="text-2xl font-bold">
+                {isOnTrial ? `${trialDaysRemaining} days` : isActive ? 'Active' : 'Inactive'}
+              </p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">SMS Credits Remaining</p>
-              <p className="text-2xl font-bold">{smsCreditsRemaining}</p>
+              <p className="text-2xl font-bold">{user.smsCreditsRemaining}</p>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Your trial ends when either the 7 days pass or you use all 20 SMS credits.
-          </p>
+          {isOnTrial && (
+            <p className="text-sm text-muted-foreground">
+              Your trial ends when either the {trialDaysRemaining} days pass or you use all SMS credits.
+            </p>
+          )}
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Starter</CardTitle>
-            <CardDescription>For small practices</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-3xl font-bold">$29<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-            </div>
-            <ul className="space-y-2 text-sm">
-              <li>Up to 100 SMS/month</li>
-              <li>Google Calendar sync</li>
-              <li>3 SMS templates</li>
-              <li>Email support</li>
-            </ul>
-            <Button className="w-full">Upgrade to Starter</Button>
-          </CardContent>
-        </Card>
-
-        <Card className="border-primary">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Professional</CardTitle>
-              <Badge>Popular</Badge>
-            </div>
-            <CardDescription>For growing practices</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-3xl font-bold">$79<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-            </div>
-            <ul className="space-y-2 text-sm">
-              <li>Unlimited SMS</li>
-              <li>Google + Outlook sync</li>
-              <li>Unlimited templates</li>
-              <li>Priority support</li>
-              <li>Analytics dashboard</li>
-            </ul>
-            <Button className="w-full">Upgrade to Professional</Button>
-          </CardContent>
-        </Card>
+      {/* Actions */}
+      <div className="flex gap-4 pt-4">
+        {isActive && user.stripeCustomerId && (
+          <ManageSubscriptionButton />
+        )}
+        <Button asChild variant={isActive ? 'ghost' : 'outline'}>
+          <Link href="/pricing">
+            {isOnTrial ? 'View plans & upgrade' : isActive ? 'View all plans' : 'Subscribe now'} →
+          </Link>
+        </Button>
       </div>
     </div>
   )

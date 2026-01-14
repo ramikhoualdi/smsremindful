@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { getAdminDb } from '@/lib/firebase/admin'
 import type { Appointment, CreateAppointmentInput } from '../types'
 import { extractPatientInfo } from '../types'
@@ -5,7 +6,8 @@ import type { CalendarEvent } from '@/lib/google/calendar'
 
 const APPOINTMENTS_COLLECTION = 'appointments'
 
-export async function getAppointmentsByUserId(userId: string): Promise<Appointment[]> {
+// Cache per request to avoid duplicate fetches across pages
+export const getAppointmentsByUserId = cache(async (userId: string): Promise<Appointment[]> => {
   const snapshot = await getAdminDb()
     .collection(APPOINTMENTS_COLLECTION)
     .where('userId', '==', userId)
@@ -14,7 +16,7 @@ export async function getAppointmentsByUserId(userId: string): Promise<Appointme
     .get()
 
   return snapshot.docs.map(docToAppointment)
-}
+})
 
 export async function getAppointmentByCalendarEventId(
   userId: string,

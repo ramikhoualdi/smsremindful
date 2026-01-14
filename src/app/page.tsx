@@ -19,6 +19,9 @@ export default async function HomePage() {
         </Link>
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost">
+            <Link href="/pricing">Pricing</Link>
+          </Button>
+          <Button asChild variant="ghost">
             <Link href="/sign-in">Sign In</Link>
           </Button>
           <Button asChild>
@@ -87,8 +90,20 @@ export default async function HomePage() {
       </section>
 
       <footer className="border-t py-8">
-        <div className="mx-auto max-w-6xl px-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} SMS Remindful. All rights reserved.</p>
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+            <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} SMS Remindful. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm text-muted-foreground">
+              <Link href="/legal/terms-of-service" className="hover:text-foreground">
+                Terms of Service
+              </Link>
+              <Link href="/legal/privacy-policy" className="hover:text-foreground">
+                Privacy Policy
+              </Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

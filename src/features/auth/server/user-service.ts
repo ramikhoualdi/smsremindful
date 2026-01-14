@@ -1,9 +1,22 @@
+import { cache } from 'react'
 import { getAdminDb } from '@/lib/firebase/admin'
 import type { User, UpdateUserInput } from '@/types/user'
 
 const USERS_COLLECTION = 'users'
 
-export async function getUserByClerkId(clerkId: string): Promise<User | null> {
+// Cache user lookup per request to avoid duplicate Firebase calls
+export const getUserByClerkId = cache(async (clerkId: string): Promise<User | null> => {
+  // Try direct document lookup first (fast path)
+  const directDoc = await getAdminDb()
+    .collection(USERS_COLLECTION)
+    .doc(clerkId)
+    .get()
+
+  if (directDoc.exists) {
+    return docToUser(directDoc)
+  }
+
+  // Fallback to query for legacy users (slower)
   const snapshot = await getAdminDb()
     .collection(USERS_COLLECTION)
     .where('clerkId', '==', clerkId)
@@ -16,7 +29,7 @@ export async function getUserByClerkId(clerkId: string): Promise<User | null> {
 
   const doc = snapshot.docs[0]
   return docToUser(doc)
-}
+})
 
 export async function createUser(clerkId: string, email: string, name: string): Promise<User> {
   const now = new Date()
@@ -36,10 +49,11 @@ export async function createUser(clerkId: string, email: string, name: string): 
     updatedAt: now,
   }
 
-  const docRef = await getAdminDb().collection(USERS_COLLECTION).add(userData)
+  // Use clerkId as document ID for O(1) lookups
+  await getAdminDb().collection(USERS_COLLECTION).doc(clerkId).set(userData)
 
   return {
-    id: docRef.id,
+    id: clerkId,
     ...userData,
   } as User
 }
@@ -51,17 +65,18 @@ export async function updateUser(userId: string, data: UpdateUserInput): Promise
   })
 }
 
-export async function getOrCreateUser(
+// Cache per request - avoids duplicate calls across pages/components
+export const getOrCreateUser = cache(async (
   clerkId: string,
   email: string,
   name: string
-): Promise<User> {
+): Promise<User> => {
   const existing = await getUserByClerkId(clerkId)
   if (existing) {
     return existing
   }
   return createUser(clerkId, email, name)
-}
+})
 
 export async function updateCalendarConnection(
   userId: string,

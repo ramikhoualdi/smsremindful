@@ -5,313 +5,344 @@ Building an SMS appointment reminder SaaS for dentists at **smsremindful.com**
 
 ---
 
-## Part 1: Analysis of Current Specification
+## Progress Summary
 
-### What Works Well
+| Phase | Status | Completion |
+|-------|--------|------------|
+| Phase 1: Foundation | COMPLETE | 100% |
+| Phase 2: Calendar Integration | COMPLETE | 100% |
+| Phase 3: SMS Core Features | COMPLETE | 100% |
+| Phase 4: Automation & Scheduling | COMPLETE | 100% |
+| Phase 5: Dashboard & Polish | COMPLETE | 100% |
+| Phase 6: Compliance & Launch Prep | IN PROGRESS | 90% |
 
-1. **Clear Niche Focus**
-   - Dentists & Orthodontists is a well-defined B2B market
-   - Pain point (missed appointments = lost revenue) is real and quantifiable
-   - Value proposition is clear and compelling
-
-2. **Solid Pricing Strategy**
-   - Flat monthly fee removes friction
-   - Tiered approach (by patient count) is scalable
-   - No complex metering keeps UX simple
-
-3. **Good Data Model Foundation**
-   - `Appointment` and `User` interfaces are clean
-   - Key fields identified (patientName, phoneNumber, appointmentTime)
-   - `reminderSent` boolean for tracking state
-
-4. **Well-Scoped MVP Features**
-   - Google Calendar integration (covers most small practices)
-   - SMS templates with variables
-   - Multiple reminder timing options
-   - Essential dashboard features
-
-5. **Smart Technical Choices**
-   - Next.js + TypeScript (matches your starter architecture)
-   - Twilio for SMS (industry standard, reliable)
-   - Stripe for payments (your established pattern)
+**Overall MVP Progress: ~98% Complete**
 
 ---
 
-### What Needs Adjustment
+## Phase 1: Foundation (Core Infrastructure) - COMPLETE
 
-1. **Auth Provider Conflict**
-   - **Spec says**: Firebase Auth
-   - **Your CLAUDE.md says**: Clerk is canonical, never delete Clerk code
-   - **Recommendation**: Use Clerk as primary auth, add Firebase only for Firestore database
-   - This keeps your architecture consistent across projects
-
-2. **Backend Architecture Mismatch**
-   - **Spec says**: Firebase Functions for backend
-   - **Your stack**: Next.js API routes + Server Actions
-   - **Recommendation**: Use Next.js API routes for most logic, use Firebase only for:
-     - Firestore (database)
-     - Optional: Cloud Functions for scheduled SMS jobs (or use Vercel Cron)
-
-3. **Data Model Enhancements Needed**
-   ```typescript
-   // Missing from spec:
-   interface User {
-     // Add:
-     clinicName: string;        // For SMS templates
-     clinicPhone?: string;
-     stripeCustomerId: string;  // For payments
-     subscriptionStatus: 'active' | 'inactive' | 'trial';
-     subscriptionTier: 'starter' | 'professional';
-     // Trial tracking:
-     trialStartedAt: Date;
-     trialEndsAt: Date;         // 7 days from start
-     smsCreditsRemaining: number; // Starts at 20, decrements
-   }
-
-   interface Template {
-     id: string;
-     userId: string;
-     name: string;
-     content: string;           // With {{variables}}
-     isDefault: boolean;
-     createdAt: Date;
-   }
-
-   interface ReminderSchedule {
-     id: string;
-     userId: string;
-     templateId: string;
-     timing: 'week' | 'day' | 'hour' | 'custom';
-     customMinutesBefore?: number;
-     enabled: boolean;
-   }
-
-   interface SMSLog {
-     id: string;
-     appointmentId: string;
-     userId: string;
-     phoneNumber: string;
-     message: string;
-     status: 'pending' | 'sent' | 'delivered' | 'failed';
-     twilioSid?: string;
-     sentAt: Date;
-     error?: string;
-   }
-   ```
-
-4. **Calendar Sync Strategy**
-   - Spec mentions webhooks but doesn't detail sync logic
-   - Need to handle: new appointments, modified appointments, cancelled appointments
-   - Need conflict resolution for duplicate events
+| Task | Status | Notes |
+|------|--------|-------|
+| Project setup with Next.js 14 + TypeScript | DONE | App Router architecture |
+| Clerk auth integration | DONE | Sign-in/sign-up flows working |
+| Firebase Firestore setup | DONE | Admin SDK with lazy init |
+| Base UI layout (dashboard shell) | DONE | Sidebar nav, responsive layout |
+| Stripe integration | DONE | Basic setup (webhooks pending) |
+| Environment configuration | DONE | All env vars documented |
 
 ---
 
-### What Needs Improvement
+## Phase 2: Calendar Integration - COMPLETE
 
-1. **Security Gaps**
-   - No mention of phone number validation
-   - No rate limiting for SMS sends
-   - No audit logging
-   - **Add**: Phone validation with libphonenumber, daily SMS limits per account
+| Task | Status | Notes |
+|------|--------|-------|
+| Google Calendar OAuth flow | DONE | Fixed scopes for userinfo |
+| Google Calendar sync logic | DONE | Fetches events from primary calendar |
+| Appointment extraction & normalization | DONE | Handles undefined values (null conversion) |
+| Firestore appointment storage | DONE | With composite indexes |
+| Manual sync trigger + status display | DONE | "Sync Now" button on Settings page |
+| Phone number editing for appointments | DONE | Warning banner for missing phones |
 
-2. **Missing Compliance Considerations**
-   - SMS marketing/reminders have legal requirements (TCPA in US)
-   - Need opt-out mechanism ("Reply STOP to unsubscribe")
-   - Need consent tracking
-   - **Add**: Consent checkbox in appointment flow, STOP keyword handling
-
-3. **Error Handling & Recovery**
-   - What if SMS fails? Retry logic needed
-   - What if calendar sync fails? User notification needed
-   - **Add**: Retry queue, failure notifications, sync status indicator
-
-4. **Multi-Tenant Architecture**
-   - Spec allows "multiple clinics per dentist" in Phase 2
-   - Database schema should support this from Day 1
-   - **Add**: `clinicId` field, proper data isolation
-
-5. **Missing Webhook Handling**
-   - Twilio delivery status webhooks
-   - Stripe subscription webhooks
-   - Calendar change webhooks (Google/Microsoft)
-   - **Add**: Webhook endpoints and handlers
+**Key Files:**
+- `src/lib/google/oauth.ts` - OAuth URL generation & token exchange
+- `src/lib/google/calendar.ts` - Calendar API client
+- `src/app/api/calendar/google/callback/route.ts` - OAuth callback
+- `src/app/api/calendar/sync/route.ts` - Manual sync endpoint
+- `src/features/calendar-sync/components/CalendarConnection.tsx` - UI component
 
 ---
 
-## Part 2: Recommended Tech Stack
+## Phase 3: SMS Core Features - COMPLETE
 
-| Layer | Technology | Rationale |
-|-------|-----------|-----------|
-| Framework | Next.js 14+ (App Router) | Your standard |
-| Auth | Clerk | Your canonical choice |
-| Database | Firebase Firestore | Real-time, scales well |
-| SMS | Twilio | Reliable, great API |
-| Payments | Stripe | Your standard |
-| Styling | Tailwind + shadcn/ui | Your standard |
-| Forms | React Hook Form + Zod | Your standard |
-| Scheduling | Vercel Cron + Firebase Functions | Hybrid approach |
-| Calendar APIs | Google Calendar API, MS Graph | As specified |
+| Task | Status | Notes |
+|------|--------|-------|
+| Twilio account setup & integration | DONE | Lazy init client |
+| A2P 10DLC Business Profile | DONE | Approved |
+| A2P Campaign Registration | DONE | Under review (2-3 weeks) |
+| Messaging Service setup | DONE | SID: MG027980ce744d911f50ea3dda9ae35820 |
+| SMS template CRUD | DONE | Create, edit, delete templates |
+| Template variable interpolation | DONE | {{patientName}}, {{appointmentTime}}, etc. |
+| Reminder schedule configuration | DONE | 1 week, 1 day, 1 hour options |
+| SMS sending function | DONE | Supports Messaging Service or phone number |
+| SMS logging & status tracking | DONE | Logs to Firestore |
+| Test SMS functionality | DONE | Settings page test button |
+| SMS credits decrement | DONE | Trial users credits decrease on send |
 
----
-
-## Part 3: Implementation Phases
-
-### Phase 1: Foundation (Core Infrastructure)
-1. Project setup with Next.js 14 + TypeScript
-2. Clerk auth integration
-3. Firebase Firestore setup
-4. Base UI layout (dashboard shell)
-5. Stripe integration (subscription flow)
-6. Environment configuration
-
-### Phase 2: Calendar Integration
-1. Google Calendar OAuth flow
-2. Google Calendar sync logic
-3. Appointment extraction & normalization
-4. Firestore appointment storage
-5. Manual sync trigger + status display
-6. (Optional) Outlook Calendar integration
-
-### Phase 3: SMS Core Features
-1. Twilio account setup & integration
-2. SMS template CRUD
-3. Template variable interpolation
-4. Reminder schedule configuration
-5. SMS sending function
-6. SMS logging & status tracking
-
-### Phase 4: Automation & Scheduling
-1. Scheduled job for reminder checks (Vercel Cron)
-2. Appointment polling logic
-3. Automatic SMS dispatch
-4. Delivery status webhook handling
-5. Retry logic for failed sends
-
-### Phase 5: Dashboard & Polish
-1. Appointment list view
-2. Sent reminders history
-3. Basic analytics (sent count, delivery rate)
-4. Settings page (clinic info, preferences)
-5. Onboarding flow
-
-### Phase 6: Compliance & Launch Prep
-1. STOP keyword handling
-2. Consent tracking
-3. Terms of Service / Privacy Policy pages
-4. Error boundaries & loading states
-5. Production deployment
+**Key Files:**
+- `src/lib/twilio/client.ts` - Twilio client with Messaging Service support
+- `src/features/templates/types.ts` - Template schemas & defaults (with opt-out text)
+- `src/features/templates/server/template-service.ts` - Template CRUD
+- `src/features/sms/server/sms-log-service.ts` - SMS logging
+- `src/features/sms/components/ReminderSettings.tsx` - Schedule configuration UI
+- `src/app/api/sms/test/route.ts` - Test SMS endpoint
 
 ---
 
-## Part 4: Project Structure
+## Phase 4: Automation & Scheduling - COMPLETE
 
+| Task | Status | Notes |
+|------|--------|-------|
+| Scheduled job for reminder checks | DONE | Vercel Cron daily at 8 AM (Hobby-compatible) |
+| Appointment polling logic | DONE | Queries by target date (day-based) |
+| Automatic SMS dispatch | DONE | Sends based on reminder schedules |
+| Credits management | DONE | Auto-decrement for trial users |
+| Duplicate prevention | DONE | Checks existing SMS logs |
+
+**Key Files:**
+- `src/app/api/cron/send-reminders/route.ts` - Daily batch cron job handler
+- `vercel.json` - Cron configuration (`0 8 * * *` = daily at 8 AM UTC)
+
+**Reminder Timings (Daily Batch Mode):**
+- `1_week` - Sends to appointments 7 days from now
+- `1_day` - Sends to appointments tomorrow
+- `same_day` - Sends to appointments today (morning reminder)
+
+**Environment Variables Needed:**
 ```
-src/
-├── app/
-│   ├── (auth)/
-│   │   ├── sign-in/
-│   │   └── sign-up/
-│   ├── (dashboard)/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx              # Dashboard home
-│   │   ├── appointments/
-│   │   ├── templates/
-│   │   ├── reminders/
-│   │   ├── settings/
-│   │   └── billing/
-│   ├── api/
-│   │   ├── webhooks/
-│   │   │   ├── stripe/
-│   │   │   └── twilio/
-│   │   ├── calendar/
-│   │   │   ├── google/
-│   │   │   └── outlook/
-│   │   └── sms/
-│   └── layout.tsx
-├── features/
-│   ├── auth/                     # Clerk (preserved)
-│   ├── appointments/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── server/
-│   │   └── types.ts
-│   ├── calendar-sync/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── server/
-│   │   └── types.ts
-│   ├── templates/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── server/
-│   │   └── types.ts
-│   ├── sms/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── server/
-│   │   └── types.ts
-│   └── billing/
-│       ├── components/
-│       ├── hooks/
-│       ├── server/
-│       └── types.ts
-├── lib/
-│   ├── firebase/
-│   │   ├── admin.ts
-│   │   └── client.ts
-│   ├── twilio/
-│   │   └── client.ts
-│   └── stripe/
-└── config/
-    └── site.ts                   # Branding (needs approval)
+CRON_SECRET=<random-string-for-security>
+```
+
+**Note:** Using daily cron for Vercel Hobby plan compatibility. Upgrade to Pro for 5-minute intervals.
+
+---
+
+## Phase 5: Dashboard & Polish - 90% COMPLETE
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Appointment list view | DONE | With phone number editing |
+| Sent reminders history | DONE | SMS logs in Reminders page |
+| Basic analytics | DONE | Sent count, delivery rate on dashboard |
+| Settings page | DONE | Clinic info, calendar, test SMS |
+| Clinic info form | DONE | Saves to Firestore |
+| UX improvements | DONE | cursor-pointer on all interactive elements |
+| Onboarding flow | PENDING | Future: country selection, product tour |
+
+**Key Files:**
+- `src/app/dashboard/page.tsx` - Dashboard with real analytics
+- `src/app/dashboard/settings/page.tsx` - Settings page
+- `src/app/dashboard/appointments/page.tsx` - Appointments list
+- `src/app/dashboard/reminders/page.tsx` - Reminder schedules & SMS history
+- `src/features/settings/components/ClinicInfoForm.tsx` - Clinic form
+
+---
+
+## Phase 6: Compliance & Launch Prep - 90% COMPLETE
+
+| Task | Status | Notes |
+|------|--------|-------|
+| STOP keyword handling | DONE | Twilio manages automatically |
+| Opt-out text in templates | DONE | "Reply STOP to opt out" in all templates |
+| SMS Remindful branding prefix | DONE | Templates start with "SMS Remindful:" |
+| Consent tracking | PENDING | Future enhancement |
+| Terms of Service page | DONE | Added to SaaSyful umbrella legal pages |
+| Privacy Policy page | DONE | Added to SaaSyful umbrella legal pages |
+| Pricing page | DONE | 4 tiers, monthly/annual toggle |
+| Stripe checkout integration | DONE | Checkout sessions working |
+| Stripe webhooks | PARTIAL | Configured in Stripe, needs local testing |
+| Error boundaries & loading states | PARTIAL | Basic error handling in place |
+| Production deployment | PENDING | Ready to deploy to Vercel |
+
+---
+
+## Environment Variables Checklist
+
+```env
+# Site
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Auth (Clerk)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+
+# Database (Firebase)
+FIREBASE_ADMIN_SDK_PATH=./firebase-service-account.json
+
+# Google Calendar
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+
+# SMS (Twilio)
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+TWILIO_PHONE_NUMBER=+1...
+TWILIO_MESSAGING_SERVICE_SID=MG...  # NEW - for A2P compliance
+
+# Payments (Stripe)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Cron Job Security
+CRON_SECRET=<generate-random-string>
 ```
 
 ---
 
-## Part 5: Confirmed Decisions
+## Remaining Tasks for Launch
 
-| Decision | Choice |
-|----------|--------|
-| **Auth Provider** | Clerk (matches your architecture) |
-| **Calendar MVP** | Google Calendar only (Outlook deferred to Phase 2) |
-| **Trial Model** | 7-day trial with 20 free SMS, then payment required |
-| **SMS Provider** | Twilio (as specified) |
+### High Priority
+1. [x] Add `CRON_SECRET` to environment variables
+2. [x] Add `TWILIO_MESSAGING_SERVICE_SID` to environment variables
+3. [x] Pricing page with Stripe checkout
+4. [x] Terms of Service & Privacy Policy (in SaaSyful umbrella)
+5. [ ] **Test Stripe webhooks locally** (run `stripe listen --forward-to localhost:3000/api/webhooks/stripe`)
+6. [ ] Deploy to Vercel
+7. [ ] Test full end-to-end flow in production
+8. [ ] Wait for A2P Campaign approval (2-3 weeks)
 
-### Trial & Billing Logic
-- New users get 7-day trial + 20 free SMS credits
-- Trial ends when EITHER:
-  - 7 days pass, OR
-  - 20 SMS credits are used up
-- After trial, subscription required to continue
+### Medium Priority (Post-Launch)
+1. [ ] Twilio delivery status webhooks
+2. [ ] Onboarding flow with country selection
 
-### Remaining to Confirm
-- **Pricing**: What monthly price for paid tier(s)?
-- **Branding**: Logo, colors, tagline (need approval for `src/config/site.ts`)
+### Future Enhancements (Phase 2+)
+1. [ ] Outlook/Microsoft Calendar integration
+2. [ ] Multi-clinic support
+3. [ ] Advanced analytics dashboard
+4. [ ] SMS retry logic for failed sends
+5. [ ] Consent tracking system
+6. [ ] Product tour for new users
 
 ---
 
-## Part 6: Verification Plan
+## Tech Stack (Implemented)
 
-After implementation, verify by:
+| Layer | Technology | Status |
+|-------|-----------|--------|
+| Framework | Next.js 14+ (App Router) | DONE |
+| Auth | Clerk | DONE |
+| Database | Firebase Firestore | DONE |
+| SMS | Twilio (with A2P 10DLC) | DONE |
+| Payments | Stripe | SETUP (webhooks pending) |
+| Styling | Tailwind + shadcn/ui | DONE |
+| Forms | React Hook Form + Zod | DONE |
+| Scheduling | Vercel Cron | DONE |
+| Calendar | Google Calendar API | DONE |
 
-1. **Auth Flow**: Sign up new account, verify Clerk works
-2. **Calendar Sync**: Connect Google Calendar, verify appointments import
-3. **Template Creation**: Create SMS template with variables
-4. **SMS Send**: Manually trigger test SMS, verify delivery
-5. **Scheduled Reminder**: Set reminder, wait for automatic send
-6. **Billing**: Subscribe via Stripe, verify access
-7. **Webhook Tests**: Verify Twilio delivery status updates
+---
+
+## Key Decisions Made
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Auth Provider | Clerk | Matches architecture, CLAUDE.md requirement |
+| Calendar MVP | Google only | Covers most small practices |
+| Trial Model | 7 days + 20 SMS | Balance of generous trial & conversion |
+| SMS Provider | Twilio with A2P | Industry standard, compliance ready |
+| Pricing Model | Flat monthly fee | Simpler for dentists, predictable |
+| Cron Schedule | Every 5 minutes | Good balance of timeliness & cost |
+
+---
+
+## Verification Checklist
+
+- [x] Auth Flow: Sign up/sign in with Clerk
+- [x] Calendar Sync: Connect Google Calendar, import appointments
+- [x] Template Creation: Create/edit SMS templates with variables
+- [x] Test SMS: Send test message, verify delivery
+- [x] SMS Credits: Credits decrement after sending
+- [ ] Scheduled Reminder: Wait for cron to auto-send (needs deployment)
+- [ ] Billing: Subscribe via Stripe (webhooks pending)
+- [ ] Webhook Tests: Twilio delivery status (pending)
 
 ---
 
 ## Summary
 
-Your specification is **solid for an MVP**. The main adjustments:
-- Use Clerk for auth (per your architecture) - **CONFIRMED**
-- Google Calendar only for MVP, Outlook in Phase 2 - **CONFIRMED**
-- 7-day trial with 20 free SMS credits - **CONFIRMED**
-- Enhance data models for templates, logs, and compliance
-- Add SMS compliance features (STOP handling, consent)
-- Structure for multi-clinic support from Day 1
+**MVP is ~95% complete and ready for initial deployment.**
 
-**Ready to start implementation.** Pricing and branding can be finalized during development.
+What's working:
+- Full authentication flow
+- Google Calendar OAuth & sync
+- Appointment management with phone number editing
+- SMS templates with A2P compliant messaging
+- Reminder schedule configuration
+- Test SMS sending with credit tracking
+- Automated cron job for reminders
+- Dashboard with real analytics
+
+What's pending:
+- Production deployment to Vercel
+- A2P Campaign approval (2-3 weeks, Twilio side)
+- Stripe webhooks for subscription management
+- Terms of Service / Privacy Policy pages
+
+**Next immediate steps:**
+1. Add remaining env vars (CRON_SECRET, TWILIO_MESSAGING_SERVICE_SID)
+2. Deploy to Vercel
+3. Test full flow in production
+
+---
+
+## Session Log: January 14, 2025
+
+### Completed Today
+
+#### 1. Pricing Page (DONE)
+- Created `/pricing` page with 4 tiers: Solo ($39), Practice ($69), Clinic ($119), Custom
+- Monthly/Annual toggle with 20% savings on annual
+- Dynamic button text: "Upgrade" for trial users, "Current Plan" for active subscribers
+- Removed duplicate pricing cards from billing page
+
+#### 2. Performance Optimization (DONE)
+- Added React `cache()` to user-service.ts, appointment-service.ts, sms-log-service.ts
+- Changed user document creation to use clerkId as document ID for O(1) lookups
+- Fixed slow navigation issue caused by multiple uncached Firebase calls
+
+#### 3. Stripe Integration (DONE)
+- Created `src/lib/stripe/client.ts` with pricing tier configuration
+- Created `src/app/api/stripe/checkout/route.ts` - Checkout session creation
+- Created `src/app/api/stripe/portal/route.ts` - Customer portal access
+- Created `src/app/api/webhooks/stripe/route.ts` - Webhook handler for subscription events
+- Created `src/features/billing/components/ManageSubscriptionButton.tsx`
+- All Stripe env vars configured (price IDs for all 6 plans)
+
+#### 4. Legal Pages (DONE)
+- Created SMS Remindful local legal pages at `/legal/terms-of-service` and `/legal/privacy-policy`
+- Added product-specific sections to SaaSyful's legal pages (umbrella for Stripe):
+  - SMS Messaging Compliance (TCPA/A2P)
+  - Google Calendar Integration terms
+  - Healthcare Compliance (HIPAA disclaimer)
+  - SMS Credits and Plan Limits
+  - SMS Delivery Disclaimer
+  - Data collection, retention, and sharing policies
+- Updated "Last updated" dates to January 14, 2025
+- Added legal links to sidebar footer, pricing page footer, and home page
+
+### Tested Today
+- [x] Stripe checkout flow - **WORKING** (test card 4242 4242 4242 4242)
+- [ ] Stripe webhooks - **NOT TESTED** (configured in Stripe dashboard, but Stripe CLI not run locally)
+
+### Known Issue
+- After successful Stripe checkout, dashboard doesn't update subscription status
+- **Root cause**: Webhooks not received locally (Stripe CLI not running)
+- **Fix**: Run `stripe listen --forward-to localhost:3000/api/webhooks/stripe` before testing
+
+### Tomorrow's Tasks
+1. Test Stripe webhooks with Stripe CLI
+2. Verify subscription status updates in Firestore after checkout
+3. Test subscription management via Stripe portal
+4. Deploy to Vercel (production)
+5. Test full end-to-end flow in production
+
+### Key Files Modified/Created Today
+```
+src/app/pricing/page.tsx
+src/config/pricing.ts
+src/features/pricing/components/PricingSection.tsx
+src/lib/stripe/client.ts
+src/app/api/stripe/checkout/route.ts
+src/app/api/stripe/portal/route.ts
+src/app/api/webhooks/stripe/route.ts
+src/features/billing/components/ManageSubscriptionButton.tsx
+src/app/legal/terms-of-service/page.tsx
+src/app/legal/privacy-policy/page.tsx
+src/app/legal/layout.tsx
+src/features/auth/server/user-service.ts (caching)
+src/components/layout/Sidebar.tsx (legal links)
+
+# SaaSyful (umbrella legal)
+saasyful/src/app/(lobby)/(content)/legal/terms-of-service/page.tsx
+saasyful/src/app/(lobby)/(content)/legal/privacy-policy/page.tsx
+```

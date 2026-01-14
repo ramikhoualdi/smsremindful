@@ -1,12 +1,14 @@
+import { cache } from 'react'
 import { getAdminDb } from '@/lib/firebase/admin'
 import type { SMSLog, CreateSMSLogInput } from '../types'
 
 const SMS_LOGS_COLLECTION = 'smsLogs'
 
-export async function getSMSLogsByUserId(
+// Cache per request
+export const getSMSLogsByUserId = cache(async (
   userId: string,
   limit: number = 50
-): Promise<SMSLog[]> {
+): Promise<SMSLog[]> => {
   const snapshot = await getAdminDb()
     .collection(SMS_LOGS_COLLECTION)
     .where('userId', '==', userId)
@@ -15,7 +17,7 @@ export async function getSMSLogsByUserId(
     .get()
 
   return snapshot.docs.map(docToSMSLog)
-}
+})
 
 export async function getSMSLogsByAppointmentId(
   appointmentId: string
@@ -88,12 +90,13 @@ export async function updateSMSLogStatus(
   await getAdminDb().collection(SMS_LOGS_COLLECTION).doc(logId).update(updateData)
 }
 
-export async function getSMSStats(userId: string): Promise<{
+// Cache per request
+export const getSMSStats = cache(async (userId: string): Promise<{
   total: number
   sent: number
   delivered: number
   failed: number
-}> {
+}> => {
   const snapshot = await getAdminDb()
     .collection(SMS_LOGS_COLLECTION)
     .where('userId', '==', userId)
@@ -115,7 +118,7 @@ export async function getSMSStats(userId: string): Promise<{
   })
 
   return stats
-}
+})
 
 // Helper to convert Firestore doc to SMSLog type
 function docToSMSLog(doc: FirebaseFirestore.DocumentSnapshot): SMSLog {
