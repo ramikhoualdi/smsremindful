@@ -37,9 +37,16 @@ export async function getAppointmentByCalendarEventId(
 export async function createAppointment(data: CreateAppointmentInput): Promise<Appointment> {
   const now = new Date()
   const appointmentData = {
-    ...data,
+    calendarEventId: data.calendarEventId,
+    userId: data.userId,
+    patientName: data.patientName,
+    patientPhone: data.patientPhone || null,
     appointmentTime: data.appointmentTime,
     endTime: data.endTime,
+    description: data.description || null,
+    location: data.location || null,
+    status: data.status,
+    sourceCalendar: data.sourceCalendar,
     lastSyncedAt: data.lastSyncedAt,
     reminderSent: false,
     createdAt: now,
@@ -58,10 +65,12 @@ export async function updateAppointment(
   appointmentId: string,
   data: Partial<Appointment>
 ): Promise<void> {
-  await getAdminDb().collection(APPOINTMENTS_COLLECTION).doc(appointmentId).update({
-    ...data,
-    updatedAt: new Date(),
-  })
+  // Convert undefined values to null for Firestore compatibility
+  const cleanData: Record<string, unknown> = { updatedAt: new Date() }
+  for (const [key, value] of Object.entries(data)) {
+    cleanData[key] = value === undefined ? null : value
+  }
+  await getAdminDb().collection(APPOINTMENTS_COLLECTION).doc(appointmentId).update(cleanData)
 }
 
 export async function deleteAppointment(appointmentId: string): Promise<void> {

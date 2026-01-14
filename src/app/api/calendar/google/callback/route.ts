@@ -44,7 +44,17 @@ export async function GET(request: NextRequest) {
     }
 
     // Exchange code for tokens
-    const tokens = await getTokensFromCode(code)
+    console.log('Exchanging code for tokens...')
+    let tokens
+    try {
+      tokens = await getTokensFromCode(code)
+      console.log('Tokens received:', { hasAccessToken: !!tokens.access_token, hasRefreshToken: !!tokens.refresh_token })
+    } catch (tokenError) {
+      console.error('Token exchange failed:', tokenError)
+      return NextResponse.redirect(
+        new URL('/dashboard/settings?error=token_exchange_failed', request.url)
+      )
+    }
 
     if (!tokens.access_token || !tokens.refresh_token) {
       console.error('Missing tokens from Google:', tokens)
@@ -54,29 +64,58 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's Google email
-    const googleUser = await getUserInfo(tokens.access_token, tokens.refresh_token)
+    console.log('Getting Google user info...')
+    let googleUser
+    try {
+      googleUser = await getUserInfo(tokens.access_token, tokens.refresh_token)
+      console.log('Google user:', googleUser.email)
+    } catch (userInfoError) {
+      console.error('Failed to get Google user info:', userInfoError)
+      return NextResponse.redirect(
+        new URL('/dashboard/settings?error=user_info_failed', request.url)
+      )
+    }
 
     // Get or create user in Firestore
-    const user = await getOrCreateUser(
-      currentUserId,
-      googleUser.email || '',
-      googleUser.name || ''
-    )
+    console.log('Getting/creating user in Firestore...')
+    let user
+    try {
+      user = await getOrCreateUser(
+        currentUserId,
+        googleUser.email || '',
+        googleUser.name || ''
+      )
+      console.log('User ID:', user.id)
+    } catch (firestoreError) {
+      console.error('Firestore user operation failed:', firestoreError)
+      return NextResponse.redirect(
+        new URL('/dashboard/settings?error=firestore_user_failed', request.url)
+      )
+    }
 
     // Update calendar connection
-    await updateCalendarConnection(user.id, {
-      accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
-      expiresAt: tokens.expiry_date ? new Date(tokens.expiry_date) : undefined,
-      email: googleUser.email || undefined,
-    })
+    console.log('Updating calendar connection...')
+    try {
+      await updateCalendarConnection(user.id, {
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiresAt: tokens.expiry_date ? new Date(tokens.expiry_date) : undefined,
+        email: googleUser.email || undefined,
+      })
+      console.log('Calendar connection updated successfully')
+    } catch (updateError) {
+      console.error('Failed to update calendar connection:', updateError)
+      return NextResponse.redirect(
+        new URL('/dashboard/settings?error=update_connection_failed', request.url)
+      )
+    }
 
     // Redirect back to settings with success
     return NextResponse.redirect(
       new URL('/dashboard/settings?success=calendar_connected', request.url)
     )
   } catch (error) {
-    console.error('Error handling Google OAuth callback:', error)
+    console.error('Unexpected error in OAuth callback:', error)
     return NextResponse.redirect(
       new URL('/dashboard/settings?error=callback_failed', request.url)
     )

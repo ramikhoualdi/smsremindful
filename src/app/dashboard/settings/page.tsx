@@ -1,9 +1,9 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { CalendarConnection } from '@/features/calendar-sync/components/CalendarConnection'
+import { ClinicInfoForm } from '@/features/settings/components/ClinicInfoForm'
+import { TestSMS } from '@/features/sms/components/TestSMS'
 import { getOrCreateUser } from '@/features/auth/server/user-service'
 
 export default async function SettingsPage({
@@ -54,24 +54,11 @@ export default async function SettingsPage({
             This information is used in your SMS templates
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="clinicName">Clinic Name</Label>
-            <Input
-              id="clinicName"
-              placeholder="Your Dental Practice"
-              defaultValue={user.clinicName || ''}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="clinicPhone">Clinic Phone</Label>
-            <Input
-              id="clinicPhone"
-              placeholder="+1 (555) 123-4567"
-              defaultValue={user.clinicPhone || ''}
-            />
-          </div>
-          <Button>Save Changes</Button>
+        <CardContent>
+          <ClinicInfoForm
+            initialClinicName={user.clinicName || ''}
+            initialClinicPhone={user.clinicPhone || ''}
+          />
         </CardContent>
       </Card>
 
@@ -88,6 +75,18 @@ export default async function SettingsPage({
             connectedEmail={user.googleEmail}
             lastSyncedAt={user.lastCalendarSync}
           />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Test SMS</CardTitle>
+          <CardDescription>
+            Send a test message to verify your SMS integration is working
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TestSMS />
         </CardContent>
       </Card>
 

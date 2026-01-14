@@ -23,6 +23,7 @@ export function CalendarConnection({
     updated: number
     deleted: number
   } | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleConnect = () => {
     window.location.href = '/api/calendar/google/connect'
@@ -52,23 +53,28 @@ export function CalendarConnection({
   const handleSync = async () => {
     setIsLoading(true)
     setSyncResult(null)
+    setError(null)
 
     try {
       const res = await fetch('/api/calendar/google/sync', {
         method: 'POST',
       })
 
+      const data = await res.json()
+
       if (res.ok) {
-        const data = await res.json()
         setSyncResult({
           created: data.created,
           updated: data.updated,
           deleted: data.deleted,
         })
         router.refresh()
+      } else {
+        setError(data.error || 'Failed to sync calendar')
       }
-    } catch (error) {
-      console.error('Error syncing:', error)
+    } catch (err) {
+      console.error('Error syncing:', err)
+      setError('Network error. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -99,6 +105,12 @@ export function CalendarConnection({
         <p className="text-sm text-muted-foreground">
           Last synced: {lastSyncedAt.toLocaleString()}
         </p>
+      )}
+
+      {error && (
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400">
+          {error}
+        </div>
       )}
 
       {syncResult && (
