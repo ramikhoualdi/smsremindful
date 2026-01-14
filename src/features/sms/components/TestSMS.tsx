@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { isUSPhoneNumber, US_PHONE_ERROR } from '@/utils/phone'
 
 export function TestSMS() {
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -13,6 +14,12 @@ export function TestSMS() {
   const handleSendTest = async () => {
     if (!phoneNumber) {
       setResult({ success: false, message: 'Please enter a phone number' })
+      return
+    }
+
+    // Validate US phone number
+    if (!isUSPhoneNumber(phoneNumber)) {
+      setResult({ success: false, message: US_PHONE_ERROR })
       return
     }
 
@@ -59,7 +66,7 @@ export function TestSMS() {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Include country code (e.g., +1 for US). With Twilio trial, you can only send to verified numbers.
+          US phone numbers only (+1). Format: (555) 123-4567 or +1 555 123 4567
         </p>
       </div>
 

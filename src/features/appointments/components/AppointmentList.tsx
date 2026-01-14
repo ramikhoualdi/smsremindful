@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog'
 import { format } from 'date-fns'
 import type { Appointment } from '../types'
+import { isUSPhoneNumber, US_PHONE_ERROR } from '@/utils/phone'
 
 interface AppointmentListProps {
   appointments: Appointment[]
@@ -40,6 +41,12 @@ export function AppointmentList({ appointments, isCalendarConnected }: Appointme
 
   const handleUpdatePhone = async () => {
     if (!editingAppointment) return
+
+    // Validate US phone number (allow empty to clear)
+    if (phoneNumber && !isUSPhoneNumber(phoneNumber)) {
+      setError(US_PHONE_ERROR)
+      return
+    }
 
     setIsLoading(true)
     setError(null)
@@ -219,7 +226,7 @@ export function AppointmentList({ appointments, isCalendarConnected }: Appointme
               type="tel"
             />
             <p className="text-xs text-muted-foreground">
-              Include country code for international numbers
+              US phone numbers only (+1). Format: (555) 123-4567
             </p>
           </div>
 

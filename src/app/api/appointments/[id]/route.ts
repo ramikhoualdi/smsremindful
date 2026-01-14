@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getUserByClerkId } from '@/features/auth/server/user-service'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { isUSPhoneNumber, normalizeUSPhoneNumber, US_PHONE_ERROR } from '@/utils/phone'
 
 const updateAppointmentSchema = z.object({
   patientPhone: z.string().optional(),
@@ -52,10 +53,22 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
+    // Validate US phone number if provided
+    let normalizedPhone: string | null = null
+    if (parsed.data.patientPhone) {
+      if (!isUSPhoneNumber(parsed.data.patientPhone)) {
+        return NextResponse.json({ error: US_PHONE_ERROR }, { status: 400 })
+      }
+      normalizedPhone = normalizeUSPhoneNumber(parsed.data.patientPhone)
+      if (!normalizedPhone) {
+        return NextResponse.json({ error: 'Invalid US phone number format' }, { status: 400 })
+      }
+    }
+
     // Build update data (convert undefined to null for Firestore)
     const updateData: Record<string, unknown> = { updatedAt: new Date() }
     if (parsed.data.patientPhone !== undefined) {
-      updateData.patientPhone = parsed.data.patientPhone || null
+      updateData.patientPhone = normalizedPhone
     }
     if (parsed.data.patientName !== undefined) {
       updateData.patientName = parsed.data.patientName

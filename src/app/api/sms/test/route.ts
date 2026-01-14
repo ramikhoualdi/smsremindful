@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { getUserByClerkId, updateUser } from '@/features/auth/server/user-service'
 import { sendSMS } from '@/lib/twilio/client'
 import { createSMSLog } from '@/features/sms/server/sms-log-service'
+import { isUSPhoneNumber, normalizeUSPhoneNumber, US_PHONE_ERROR } from '@/utils/phone'
 
 const testSMSSchema = z.object({
   phoneNumber: z.string().min(10, 'Invalid phone number'),
@@ -31,12 +32,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate US phone number
+    if (!isUSPhoneNumber(parsed.data.phoneNumber)) {
+      return NextResponse.json(
+        { error: US_PHONE_ERROR },
+        { status: 400 }
+      )
+    }
+
+    // Normalize to E.164 format
+    const normalizedPhone = normalizeUSPhoneNumber(parsed.data.phoneNumber)
+    if (!normalizedPhone) {
+      return NextResponse.json(
+        { error: 'Invalid US phone number format' },
+        { status: 400 }
+      )
+    }
+
     const testMessage = `SMS Remindful: This is a test message. Your SMS integration is working correctly! Reply STOP to opt out.`
 
-    console.log('Sending test SMS to:', parsed.data.phoneNumber)
+    console.log('Sending test SMS to:', normalizedPhone)
 
     const result = await sendSMS({
-      to: parsed.data.phoneNumber,
+      to: normalizedPhone,
       body: testMessage,
     })
 
@@ -44,7 +62,7 @@ export async function POST(request: NextRequest) {
     await createSMSLog({
       userId: user.id,
       appointmentId: 'test',
-      phoneNumber: parsed.data.phoneNumber,
+      phoneNumber: normalizedPhone,
       message: testMessage,
       status: result.success ? 'sent' : 'failed',
       twilioSid: result.sid,

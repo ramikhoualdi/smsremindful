@@ -5,6 +5,7 @@ import { createSMSLog } from '@/features/sms/server/sms-log-service'
 import { interpolateTemplate } from '@/features/templates/types'
 import { REMINDER_TIMINGS, type ReminderTiming } from '@/features/sms/types'
 import { format, startOfDay, endOfDay, addDays } from 'date-fns'
+import { isUSPhoneNumber, normalizeUSPhoneNumber } from '@/utils/phone'
 
 // Verify cron secret to prevent unauthorized access
 const CRON_SECRET = process.env.CRON_SECRET
@@ -94,6 +95,21 @@ export async function GET(request: NextRequest) {
           continue
         }
 
+        // Skip if not a US phone number
+        if (!isUSPhoneNumber(appointment.patientPhone)) {
+          console.log(`Skipping appointment ${appointmentDoc.id}: non-US phone number`)
+          results.skipped++
+          continue
+        }
+
+        // Normalize phone to E.164 format
+        const normalizedPhone = normalizeUSPhoneNumber(appointment.patientPhone)
+        if (!normalizedPhone) {
+          console.log(`Skipping appointment ${appointmentDoc.id}: invalid phone format`)
+          results.skipped++
+          continue
+        }
+
         // Skip if reminder already sent for this timing
         const existingLogSnapshot = await getAdminDb()
           .collection('smsLogs')
@@ -125,11 +141,11 @@ export async function GET(request: NextRequest) {
           clinicPhone: user.clinicPhone || '',
         })
 
-        console.log(`Sending reminder to ${appointment.patientPhone}`)
+        console.log(`Sending reminder to ${normalizedPhone}`)
 
         // Send SMS
         const result = await sendSMS({
-          to: appointment.patientPhone,
+          to: normalizedPhone,
           body: message,
         })
 
@@ -138,7 +154,7 @@ export async function GET(request: NextRequest) {
           userId,
           appointmentId: appointmentDoc.id,
           templateId,
-          phoneNumber: appointment.patientPhone,
+          phoneNumber: normalizedPhone,
           message,
           status: result.success ? 'sent' : 'failed',
           twilioSid: result.sid,
