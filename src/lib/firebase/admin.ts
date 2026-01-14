@@ -36,7 +36,16 @@ function getAdminApp(): App {
           (jsonStr.startsWith("'") && jsonStr.endsWith("'"))) {
         jsonStr = jsonStr.slice(1, -1)
       }
+      // Fix: Vercel converts \n to actual newlines - convert them back for JSON parsing
+      // But we need to be careful: the private_key field needs actual \n chars after parsing
+      jsonStr = jsonStr.replace(/\n/g, '\\n')
       serviceAccountData = JSON.parse(jsonStr)
+
+      // Now convert \\n back to actual \n in the private_key field
+      if ('private_key' in serviceAccountData && typeof (serviceAccountData as Record<string, unknown>).private_key === 'string') {
+        (serviceAccountData as Record<string, string>).private_key =
+          (serviceAccountData as Record<string, string>).private_key.replace(/\\n/g, '\n')
+      }
     }
     else {
       throw new Error(
