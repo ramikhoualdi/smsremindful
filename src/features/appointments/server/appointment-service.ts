@@ -105,7 +105,7 @@ export async function syncCalendarEvents(
   for (const event of events) {
     seenEventIds.add(event.id)
 
-    const patientInfo = extractPatientInfo(event.summary, event.description, event.attendees)
+    const patientInfo = extractPatientInfo(event.summary, event.description, event.attendees, event.location)
 
     const existing = existingByEventId.get(event.id)
 
