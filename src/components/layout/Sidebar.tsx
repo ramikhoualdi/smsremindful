@@ -1,8 +1,17 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
@@ -13,11 +22,12 @@ const navigation = [
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCardIcon },
 ]
 
+// Desktop Sidebar
 export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="flex w-64 flex-col border-r bg-muted/30">
+    <aside className="hidden md:flex w-64 flex-col border-r bg-muted/30">
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-lg font-bold">SMS Remindful</span>
@@ -48,7 +58,72 @@ export function Sidebar() {
   )
 }
 
-// Simple icon components
+// Mobile Sidebar (Sheet)
+export function MobileSidebar() {
+  const pathname = usePathname()
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden">
+          <MenuIcon className="h-6 w-6" />
+          <span className="sr-only">Toggle menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-64 p-0" aria-describedby={undefined}>
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <div className="flex h-16 items-center border-b px-6">
+          <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+            <span className="text-lg font-bold">SMS Remindful</span>
+          </Link>
+        </div>
+        <nav className="flex-1 space-y-1 p-4">
+          {navigation.map((item) => {
+            const isActive = pathname === item.href ||
+              (item.href !== '/dashboard' && pathname.startsWith(item.href))
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+// Icon components
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+      />
+    </svg>
+  )
+}
+
 function HomeIcon({ className }: { className?: string }) {
   return (
     <svg

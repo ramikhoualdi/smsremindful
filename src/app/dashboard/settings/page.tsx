@@ -1,10 +1,31 @@
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+import { CalendarConnection } from '@/features/calendar-sync/components/CalendarConnection'
+import { getOrCreateUser } from '@/features/auth/server/user-service'
 
-export default function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string; error?: string }>
+}) {
+  const { userId } = await auth()
+  const clerkUser = await currentUser()
+  const params = await searchParams
+
+  if (!userId || !clerkUser) {
+    return null
+  }
+
+  // Get or create user in Firestore
+  const user = await getOrCreateUser(
+    userId,
+    clerkUser.emailAddresses[0]?.emailAddress || '',
+    clerkUser.fullName || clerkUser.firstName || ''
+  )
+
   return (
     <div className="space-y-6">
       <div>
@@ -13,6 +34,18 @@ export default function SettingsPage() {
           Manage your clinic profile and integrations
         </p>
       </div>
+
+      {params.success === 'calendar_connected' && (
+        <div className="rounded-lg bg-green-50 p-4 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+          Google Calendar connected successfully! Click &quot;Sync Now&quot; to import your appointments.
+        </div>
+      )}
+
+      {params.error && (
+        <div className="rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-400">
+          {getErrorMessage(params.error)}
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -24,11 +57,19 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="clinicName">Clinic Name</Label>
-            <Input id="clinicName" placeholder="Your Dental Practice" />
+            <Input
+              id="clinicName"
+              placeholder="Your Dental Practice"
+              defaultValue={user.clinicName || ''}
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="clinicPhone">Clinic Phone</Label>
-            <Input id="clinicPhone" placeholder="+1 (555) 123-4567" />
+            <Input
+              id="clinicPhone"
+              placeholder="+1 (555) 123-4567"
+              defaultValue={user.clinicPhone || ''}
+            />
           </div>
           <Button>Save Changes</Button>
         </CardContent>
@@ -41,27 +82,12 @@ export default function SettingsPage() {
             Connect your calendar to automatically sync appointments
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                <svg className="h-6 w-6" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-15A2.5 2.5 0 0 1 4.5 2h15A2.5 2.5 0 0 1 22 4.5v15a2.5 2.5 0 0 1-2.5 2.5zM9.5 7H7v2h2.5V7zm0 4H7v2h2.5v-2zm0 4H7v2h2.5v-2zm4 0h-2v2h2v-2zm0-4h-2v2h2v-2zm0-4h-2v2h2V7zm4 8h-2v2h2v-2zm0-4h-2v2h2v-2zm0-4h-2v2h2V7z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium">Google Calendar</p>
-                <p className="text-sm text-muted-foreground">
-                  Sync appointments from your Google Calendar
-                </p>
-              </div>
-            </div>
-            <Badge variant="outline">Not Connected</Badge>
-          </div>
-          <Button className="w-full">Connect Google Calendar</Button>
+        <CardContent>
+          <CalendarConnection
+            isConnected={user.calendarConnected}
+            connectedEmail={user.googleEmail}
+            lastSyncedAt={user.lastCalendarSync}
+          />
         </CardContent>
       </Card>
 
@@ -78,4 +104,23 @@ export default function SettingsPage() {
       </Card>
     </div>
   )
+}
+
+function getErrorMessage(error: string): string {
+  switch (error) {
+    case 'oauth_denied':
+      return 'You denied access to Google Calendar. Please try again if you want to connect.'
+    case 'missing_params':
+      return 'Invalid OAuth response. Please try connecting again.'
+    case 'invalid_state':
+      return 'Security validation failed. Please try connecting again.'
+    case 'user_mismatch':
+      return 'User session mismatch. Please sign in again and try connecting.'
+    case 'missing_tokens':
+      return 'Failed to get access tokens from Google. Please try again.'
+    case 'callback_failed':
+      return 'Failed to complete the connection. Please try again.'
+    default:
+      return 'An error occurred. Please try again.'
+  }
 }

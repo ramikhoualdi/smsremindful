@@ -15,7 +15,11 @@ export const userSchema = z.object({
   trialEndsAt: z.date(),
   smsCreditsRemaining: z.number().default(20),
   calendarConnected: z.boolean().default(false),
+  googleAccessToken: z.string().optional(),
   googleRefreshToken: z.string().optional(),
+  googleTokenExpiresAt: z.date().optional(),
+  googleEmail: z.string().optional(),
+  lastCalendarSync: z.date().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
@@ -32,7 +36,11 @@ export const createUserSchema = userSchema.omit({
   subscriptionTier: true,
   smsCreditsRemaining: true,
   calendarConnected: true,
+  googleAccessToken: true,
   googleRefreshToken: true,
+  googleTokenExpiresAt: true,
+  googleEmail: true,
+  lastCalendarSync: true,
 })
 
 export type CreateUserInput = z.infer<typeof createUserSchema>
