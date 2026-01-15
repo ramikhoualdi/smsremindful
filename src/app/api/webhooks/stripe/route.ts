@@ -102,47 +102,90 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 }
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription) {
-  const firestoreUserId = subscription.metadata?.firestoreUserId
-  const plan = subscription.metadata?.plan as PlanId | undefined
+  const customerId = subscription.customer as string
 
-  if (!firestoreUserId) {
-    // Try to find user by customer ID
-    const customerId = subscription.customer as string
-    const userSnapshot = await getAdminDb()
-      .collection(USERS_COLLECTION)
-      .where('stripeCustomerId', '==', customerId)
-      .limit(1)
-      .get()
+  // Find user by customer ID
+  const userSnapshot = await getAdminDb()
+    .collection(USERS_COLLECTION)
+    .where('stripeCustomerId', '==', customerId)
+    .limit(1)
+    .get()
 
-    if (userSnapshot.empty) {
-      console.error('No user found for subscription:', subscription.id)
-      return
-    }
-
-    const userId = userSnapshot.docs[0].id
-    const status = subscription.status === 'active' ? 'active' : 'inactive'
-
-    await getAdminDb().collection(USERS_COLLECTION).doc(userId).update({
-      subscriptionStatus: status,
-      updatedAt: new Date(),
-    })
+  if (userSnapshot.empty) {
+    console.error('No user found for subscription:', subscription.id)
     return
   }
 
-  const planConfig = PRICING_PLANS.find((p) => p.id === plan)
+  const userDoc = userSnapshot.docs[0]
+  const userData = userDoc.data()
+  const userId = userDoc.id
   const status = subscription.status === 'active' ? 'active' : 'inactive'
+
+  // Get the new plan from the subscription's price
+  const priceId = subscription.items.data[0]?.price?.id
+  const newPlan = getPlanFromPriceId(priceId)
+  const newPlanConfig = PRICING_PLANS.find((p) => p.id === newPlan)
+
+  const oldPlan = userData.subscriptionTier as PlanId | undefined
+  const oldPlanConfig = PRICING_PLANS.find((p) => p.id === oldPlan)
+
+  // Store billing period end date for display
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const subData = subscription as any
+  const periodEnd = subData.current_period_end || subData.billing_cycle_anchor
+  const currentPeriodEnd = periodEnd && typeof periodEnd === 'number'
+    ? new Date(periodEnd * 1000)
+    : null
 
   const updateData: Record<string, unknown> = {
     subscriptionStatus: status,
+    currentPeriodEnd,
     updatedAt: new Date(),
   }
 
-  if (plan) {
-    updateData.subscriptionTier = plan
+  if (newPlan) {
+    updateData.subscriptionTier = newPlan
+
+    // Handle plan upgrade: add new plan credits to remaining credits
+    if (oldPlan && newPlan !== oldPlan && newPlanConfig) {
+      const currentCredits = userData.smsCreditsRemaining || 0
+      const newPlanCredits = newPlanConfig.smsLimit || 0
+
+      // If upgrading (new plan has more credits), add new credits to remaining
+      // If downgrading, just set to new plan's limit
+      const oldLimit = oldPlanConfig?.smsLimit || 0
+      const isUpgrade = newPlanCredits > oldLimit
+
+      if (isUpgrade) {
+        // Upgrade: keep remaining + add full new plan credits
+        updateData.smsCreditsRemaining = currentCredits + newPlanCredits
+        console.log(`Plan upgrade: ${oldPlan} → ${newPlan}, credits: ${currentCredits} + ${newPlanCredits} = ${currentCredits + newPlanCredits}`)
+      } else {
+        // Downgrade: set to new plan's limit (or keep current if less)
+        updateData.smsCreditsRemaining = Math.min(currentCredits, newPlanCredits)
+        console.log(`Plan downgrade: ${oldPlan} → ${newPlan}, credits set to: ${updateData.smsCreditsRemaining}`)
+      }
+    }
   }
 
-  await getAdminDb().collection(USERS_COLLECTION).doc(firestoreUserId).update(updateData)
-  console.log(`Subscription updated for user ${firestoreUserId}: ${status}`)
+  await getAdminDb().collection(USERS_COLLECTION).doc(userId).update(updateData)
+  console.log(`Subscription updated for user ${userId}: ${status}, plan: ${newPlan || 'unchanged'}`)
+}
+
+// Helper to get plan ID from Stripe price ID
+function getPlanFromPriceId(priceId: string | undefined): PlanId | undefined {
+  if (!priceId) return undefined
+
+  const priceToPlans: Record<string, PlanId> = {
+    [process.env.STRIPE_PRICE_SOLO_MONTHLY || '']: 'solo',
+    [process.env.STRIPE_PRICE_SOLO_ANNUAL || '']: 'solo',
+    [process.env.STRIPE_PRICE_PRACTICE_MONTHLY || '']: 'practice',
+    [process.env.STRIPE_PRICE_PRACTICE_ANNUAL || '']: 'practice',
+    [process.env.STRIPE_PRICE_CLINIC_MONTHLY || '']: 'clinic',
+    [process.env.STRIPE_PRICE_CLINIC_ANNUAL || '']: 'clinic',
+  }
+
+  return priceToPlans[priceId]
 }
 
 async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {

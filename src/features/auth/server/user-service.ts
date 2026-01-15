@@ -129,6 +129,7 @@ function docToUser(doc: FirebaseFirestore.DocumentSnapshot): User {
     stripeCustomerId: data.stripeCustomerId,
     subscriptionStatus: data.subscriptionStatus,
     subscriptionTier: data.subscriptionTier,
+    currentPeriodEnd: data.currentPeriodEnd?.toDate(),
     trialStartedAt: data.trialStartedAt?.toDate(),
     trialEndsAt: data.trialEndsAt?.toDate(),
     smsCreditsRemaining: data.smsCreditsRemaining,

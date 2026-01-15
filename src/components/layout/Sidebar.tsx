@@ -56,10 +56,10 @@ export function Sidebar() {
       </nav>
       <div className="border-t p-4">
         <div className="flex gap-4 text-xs text-muted-foreground">
-          <Link href="/legal/terms-of-service" className="hover:text-foreground">
+          <Link href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
             Terms
           </Link>
-          <Link href="/legal/privacy-policy" className="hover:text-foreground">
+          <Link href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
             Privacy
           </Link>
         </div>
@@ -112,10 +112,10 @@ export function MobileSidebar() {
         </nav>
         <div className="border-t p-4">
           <div className="flex gap-4 text-xs text-muted-foreground">
-            <Link href="/legal/terms-of-service" onClick={() => setOpen(false)} className="hover:text-foreground">
+            <Link href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className="hover:text-foreground">
               Terms
             </Link>
-            <Link href="/legal/privacy-policy" onClick={() => setOpen(false)} className="hover:text-foreground">
+            <Link href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className="hover:text-foreground">
               Privacy
             </Link>
           </div>

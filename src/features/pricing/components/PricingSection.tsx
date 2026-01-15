@@ -17,9 +17,10 @@ import {
 interface PricingSectionProps {
   currentPlan?: string | null
   isOnTrial?: boolean
+  hasActiveSubscription?: boolean
 }
 
-export function PricingSection({ currentPlan, isOnTrial }: PricingSectionProps) {
+export function PricingSection({ currentPlan, isOnTrial, hasActiveSubscription }: PricingSectionProps) {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly')
 
   return (
@@ -89,6 +90,7 @@ export function PricingSection({ currentPlan, isOnTrial }: PricingSectionProps) 
               billingPeriod={billingPeriod}
               isCurrentPlan={currentPlan === plan.id}
               isOnTrial={isOnTrial}
+              hasActiveSubscription={hasActiveSubscription}
             />
           ))}
         </div>
@@ -102,9 +104,10 @@ interface PricingCardProps {
   billingPeriod: 'monthly' | 'annual'
   isCurrentPlan: boolean
   isOnTrial?: boolean
+  hasActiveSubscription?: boolean
 }
 
-function PricingCard({ plan, billingPeriod, isCurrentPlan, isOnTrial }: PricingCardProps) {
+function PricingCard({ plan, billingPeriod, isCurrentPlan, isOnTrial, hasActiveSubscription }: PricingCardProps) {
   const router = useRouter()
   const { isSignedIn } = useUser()
   const [isLoading, setIsLoading] = useState(false)
@@ -131,8 +134,33 @@ function PricingCard({ plan, billingPeriod, isCurrentPlan, isOnTrial }: PricingC
       return
     }
 
-    // Redirect to Stripe checkout
     setIsLoading(true)
+
+    // If user has active subscription, redirect to billing portal for plan changes
+    if (hasActiveSubscription) {
+      try {
+        const response = await fetch('/api/stripe/portal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        })
+
+        const data = await response.json()
+
+        if (data.url) {
+          window.open(data.url, '_blank', 'noopener,noreferrer')
+          setIsLoading(false)
+        } else {
+          console.error('No portal URL returned')
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.error('Portal error:', error)
+        setIsLoading(false)
+      }
+      return
+    }
+
+    // New subscription - redirect to Stripe checkout (same tab for better UX)
     try {
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -146,7 +174,7 @@ function PricingCard({ plan, billingPeriod, isCurrentPlan, isOnTrial }: PricingC
       const data = await response.json()
 
       if (data.url) {
-        window.location.href = data.url
+        window.location.href = data.url  // Same tab - Stripe will redirect back after payment
       } else {
         console.error('No checkout URL returned')
         setIsLoading(false)

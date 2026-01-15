@@ -9,11 +9,13 @@ export default async function PricingPage() {
 
   let currentPlan: string | null = null
   let isOnTrial = false
+  let hasActiveSubscription = false
 
   if (userId) {
     const user = await getUserByClerkId(userId)
     if (user?.subscriptionStatus === 'active' && user.subscriptionTier) {
       currentPlan = user.subscriptionTier
+      hasActiveSubscription = true
     }
     if (user?.subscriptionStatus === 'trial') {
       isOnTrial = true
@@ -48,7 +50,7 @@ export default async function PricingPage() {
       </header>
 
       <main className="flex-1">
-        <PricingSection currentPlan={currentPlan} isOnTrial={isOnTrial} />
+        <PricingSection currentPlan={currentPlan} isOnTrial={isOnTrial} hasActiveSubscription={hasActiveSubscription} />
       </main>
 
       <footer className="border-t py-8">
@@ -58,10 +60,10 @@ export default async function PricingPage() {
               &copy; {new Date().getFullYear()} SMS Remindful. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link href="/legal/terms-of-service" className="hover:text-foreground">
+              <Link href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
                 Terms of Service
               </Link>
-              <Link href="/legal/privacy-policy" className="hover:text-foreground">
+              <Link href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
                 Privacy Policy
               </Link>
             </div>

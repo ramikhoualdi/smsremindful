@@ -16,7 +16,8 @@ export function ManageSubscriptionButton() {
       const data = await response.json()
 
       if (data.url) {
-        window.location.href = data.url
+        window.open(data.url, '_blank', 'noopener,noreferrer')
+        setIsLoading(false)
       } else {
         console.error('No portal URL returned:', data.error)
         setIsLoading(false)

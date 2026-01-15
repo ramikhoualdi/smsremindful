@@ -96,10 +96,10 @@ export default async function HomePage() {
               &copy; {new Date().getFullYear()} SMS Remindful. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link href="/legal/terms-of-service" className="hover:text-foreground">
+              <Link href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
                 Terms of Service
               </Link>
-              <Link href="/legal/privacy-policy" className="hover:text-foreground">
+              <Link href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
                 Privacy Policy
               </Link>
             </div>

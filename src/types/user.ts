@@ -11,6 +11,7 @@ export const userSchema = z.object({
   stripeCustomerId: z.string().optional(),
   subscriptionStatus: z.enum(['active', 'inactive', 'trial']).default('trial'),
   subscriptionTier: z.enum(['solo', 'practice', 'clinic', 'custom']).optional(),
+  currentPeriodEnd: z.date().optional(), // Next billing date / credits reset
   trialStartedAt: z.date(),
   trialEndsAt: z.date(),
   smsCreditsRemaining: z.number().default(20),
