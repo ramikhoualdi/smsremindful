@@ -1,6 +1,6 @@
 # SMS Remindful - Complete Project Scope
 
-**Document Version:** 1.4
+**Document Version:** 1.5
 **Last Updated:** January 16, 2025
 **Status:** DEPLOYED TO PRODUCTION - Final Testing in Progress
 
@@ -123,7 +123,17 @@ An automated SMS reminder system that:
 | Calendar connection | DONE | Connect/disconnect Google |
 | Test SMS sending | DONE | Verify phone/Twilio setup |
 
-#### 11. Compliance & Legal
+#### 11. Onboarding Flow
+| Feature | Status | Details |
+|---------|--------|---------|
+| Onboarding wizard | DONE | 3-step setup flow for new users |
+| Clinic profile step | DONE | Required: clinic name + phone |
+| Calendar connect step | DONE | Optional: Google Calendar OAuth |
+| Test SMS step | DONE | Optional: send test message |
+| Onboarding redirect | DONE | Dashboard redirects until completed |
+| Live SMS preview | DONE | Shows how messages will appear |
+
+#### 12. Compliance & Legal
 | Feature | Status | Details |
 |---------|--------|---------|
 | Terms of Service | DONE | Local + SaaSyful umbrella |
@@ -171,6 +181,7 @@ An automated SMS reminder system that:
   smsCredits: number
   trialEndsAt?: Date
   currentPeriodEnd?: Date
+  onboardingCompleted: boolean  // New: tracks if user completed onboarding
   createdAt: Date
   updatedAt: Date
 }
@@ -241,6 +252,8 @@ An automated SMS reminder system that:
 | `/api/stripe/portal` | POST | Create portal session |
 | `/api/webhooks/stripe` | POST | Handle Stripe webhooks |
 | `/api/cron/send-reminders` | GET | Automated reminder job |
+| `/api/user/profile` | PATCH | Update clinic profile |
+| `/api/user/complete-onboarding` | POST | Mark onboarding complete |
 
 ### Environment Variables
 
@@ -511,7 +524,7 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://smsremindful.com/api/cron/s
 |---------|----------|--------|--------|
 | Twilio delivery status webhooks | HIGH | Track actual delivery vs just "sent" | Low |
 | Low credits email notification | HIGH | Reduce churn, upsell opportunity | Low |
-| Onboarding wizard | HIGH | Improve activation rate | Medium |
+| ~~Onboarding wizard~~ | ~~HIGH~~ | ~~Improve activation rate~~ | ~~Medium~~ | **DONE** |
 | Product tour for new users | MEDIUM | Reduce support, improve UX | Low |
 | Dashboard analytics improvements | MEDIUM | Show ROI to customers | Medium |
 | Appointment confirmation replies | MEDIUM | Two-way SMS "Confirm/Cancel" | Medium |
@@ -1117,6 +1130,7 @@ Talk soon!
 | 1.2 | Jan 15, 2025 | Added sales/marketing strategy, detailed roadmap, 90-day goals |
 | 1.3 | Jan 15, 2025 | Added research analysis, upgraded email campaign, reply templates |
 | 1.4 | Jan 16, 2025 | Stripe live payment tested, credits fix, portal confirmed |
+| 1.5 | Jan 16, 2025 | Added onboarding wizard (3-step flow), SMS 0-credit enforcement, smart error messages |
 
 ---
 
