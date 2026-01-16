@@ -45,6 +45,7 @@ export async function createUser(clerkId: string, email: string, name: string): 
     trialEndsAt,
     smsCreditsRemaining: 20,
     calendarConnected: false,
+    onboardingCompleted: false,
     createdAt: now,
     updatedAt: now,
   }
@@ -139,6 +140,7 @@ function docToUser(doc: FirebaseFirestore.DocumentSnapshot): User {
     googleTokenExpiresAt: data.googleTokenExpiresAt?.toDate(),
     googleEmail: data.googleEmail,
     lastCalendarSync: data.lastCalendarSync?.toDate(),
+    onboardingCompleted: data.onboardingCompleted ?? false,
     createdAt: data.createdAt?.toDate(),
     updatedAt: data.updatedAt?.toDate(),
   } as User

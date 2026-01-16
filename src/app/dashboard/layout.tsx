@@ -1,11 +1,27 @@
+import { auth } from '@clerk/nextjs/server'
+import { redirect } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
 import { Sidebar, MobileSidebar } from '@/components/layout/Sidebar'
+import { getUserByClerkId } from '@/features/auth/server/user-service'
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { userId } = await auth()
+
+  if (!userId) {
+    redirect('/sign-in')
+  }
+
+  const user = await getUserByClerkId(userId)
+
+  // Redirect to onboarding if not completed
+  if (user && !user.onboardingCompleted) {
+    redirect('/onboarding')
+  }
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />

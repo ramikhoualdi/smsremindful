@@ -1,8 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUrl } from '@/lib/google/oauth'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth()
 
@@ -10,8 +10,14 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Create state with user ID for callback verification
-    const state = Buffer.from(JSON.stringify({ clerkId: userId })).toString('base64')
+    // Get optional redirect parameter
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || '/dashboard/settings'
+
+    // Create state with user ID and redirect URL for callback
+    const state = Buffer.from(JSON.stringify({
+      clerkId: userId,
+      redirectTo,
+    })).toString('base64')
 
     const authUrl = getAuthUrl(state)
 

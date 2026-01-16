@@ -21,6 +21,7 @@ export const userSchema = z.object({
   googleTokenExpiresAt: z.date().optional(),
   googleEmail: z.string().optional(),
   lastCalendarSync: z.date().optional(),
+  onboardingCompleted: z.boolean().default(false),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
