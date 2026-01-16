@@ -89,16 +89,24 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 
   const planConfig = PRICING_PLANS.find((p) => p.id === plan)
-  const smsLimit = planConfig?.smsLimit || 300
+  const newPlanCredits = planConfig?.smsLimit || 300
+
+  // Get current user data to add credits to existing balance
+  const userDoc = await getAdminDb().collection(USERS_COLLECTION).doc(firestoreUserId).get()
+  const userData = userDoc.data()
+  const currentCredits = userData?.smsCreditsRemaining || 0
+
+  // Add new plan credits to remaining credits (e.g., trial credits + new plan credits)
+  const totalCredits = currentCredits + newPlanCredits
 
   await getAdminDb().collection(USERS_COLLECTION).doc(firestoreUserId).update({
     subscriptionStatus: 'active',
     subscriptionTier: plan,
-    smsCreditsRemaining: smsLimit,
+    smsCreditsRemaining: totalCredits,
     updatedAt: new Date(),
   })
 
-  console.log(`User ${firestoreUserId} subscribed to ${plan} plan`)
+  console.log(`User ${firestoreUserId} subscribed to ${plan} plan. Credits: ${currentCredits} + ${newPlanCredits} = ${totalCredits}`)
 }
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription) {
