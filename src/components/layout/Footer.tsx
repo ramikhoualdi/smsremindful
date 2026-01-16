@@ -14,7 +14,7 @@ export function Footer({ showAbout = false }: FooterProps) {
             affordable SMS appointment reminder service designed specifically for dental practices.
           </p>
           <p>
-            Syncs with Google Calendar • Automated reminders • Plans from $39/month
+            Syncs with Google Calendar • Automated reminders • Plans from $49/month
           </p>
         </section>
       )}

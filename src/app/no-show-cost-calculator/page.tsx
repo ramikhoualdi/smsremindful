@@ -31,7 +31,7 @@ export default function NoShowCostCalculatorPage() {
   const yearlySavings = Math.round(yearlyLoss * reductionRate)
 
   // SMS Remindful pricing based on weekly appointments
-  const monthlyPlanCost = appointmentsPerWeek <= 75 ? 39 : appointmentsPerWeek <= 200 ? 69 : 119
+  const monthlyPlanCost = appointmentsPerWeek <= 75 ? 49 : appointmentsPerWeek <= 200 ? 99 : 149
   const yearlyPlanCost = monthlyPlanCost * 12
   const netYearlySavings = yearlySavings - yearlyPlanCost
   const roi = yearlyPlanCost > 0 ? Math.round((netYearlySavings / yearlyPlanCost) * 100) : 0

@@ -16,8 +16,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     id: 'solo',
     name: 'Solo',
     description: 'Perfect for solo practitioners',
-    monthlyPrice: 39,
-    annualPrice: 31, // ~20% off
+    monthlyPrice: 49,
+    annualPrice: 39, // ~20% off
     smsLimit: 300,
     featured: false,
     features: [
@@ -33,8 +33,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     id: 'practice',
     name: 'Practice',
     description: 'Most popular - ideal for small practices',
-    monthlyPrice: 69,
-    annualPrice: 55, // ~20% off
+    monthlyPrice: 99,
+    annualPrice: 79, // ~20% off
     smsLimit: 800,
     featured: true,
     features: [
@@ -50,8 +50,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     id: 'clinic',
     name: 'Clinic',
     description: 'For busy multi-dentist practices',
-    monthlyPrice: 119,
-    annualPrice: 95, // ~20% off
+    monthlyPrice: 149,
+    annualPrice: 119, // ~20% off
     smsLimit: 2000,
     featured: false,
     features: [
