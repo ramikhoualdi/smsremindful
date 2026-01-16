@@ -312,24 +312,24 @@ The application has been deployed to production at **https://smsremindful.com**
 | Feature | Local | Production | Notes |
 |---------|-------|------------|-------|
 | User sign up/sign in | PASSED | PASSED | Clerk production instance |
-| Google Calendar OAuth | PASSED | PENDING | Production URIs configured |
-| Calendar sync | PASSED | PENDING | Needs production test |
+| Google Calendar OAuth | PASSED | PASSED | Connected (needs Google verification) |
+| Calendar sync | PASSED | PASSED | Appointments synced correctly |
 | Appointment phone editing | PASSED | PENDING | Needs production test |
 | Template CRUD | PASSED | PENDING | Needs production test |
 | Test SMS sending | PASSED | PASSED | Working in production |
 | SMS credits decrement | PASSED | PENDING | Needs production test |
 | Stripe checkout | PASSED | PASSED | Live payment works, 300 credits received |
 | Stripe webhooks | PASSED | PASSED | Credits updated via webhook |
-| Stripe portal | PASSED | PENDING | Needs production test |
+| Stripe portal | PASSED | PASSED | Plan changes, downgrade at period end |
 | Billing page info | PASSED | PENDING | Needs production test |
 
 ### What Still Needs Production Testing
 
 | Feature | Priority | Status | Test Plan |
 |---------|----------|--------|-----------|
-| **Vercel Cron Job** | CRITICAL | PENDING | Manual trigger test (see below) |
+| **Vercel Cron Job** | CRITICAL | PASSED | Manual test: checked 1, sent 1, failed 0 |
 | **Stripe Live Payment** | HIGH | PASSED | Real card checkout works, 300 credits received |
-| **Google Calendar OAuth** | HIGH | PENDING | Full OAuth flow in production |
+| **Google Calendar OAuth** | HIGH | PASSED | Connected, needs Google verification |
 | A2P SMS delivery | HIGH | BLOCKED | Waiting for campaign approval (2-3 weeks) |
 | Multi-user load | MEDIUM | PENDING | Multiple concurrent users |
 | Calendar sync at scale | MEDIUM | PENDING | Large appointment volumes |
@@ -485,14 +485,26 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://smsremindful.com/api/cron/s
 - [x] Test sign up flow - WORKING
 - [x] Test SMS sending - WORKING
 - [x] Test Stripe checkout (live mode) - WORKING (300 credits received)
-- [ ] Test Google Calendar connection - PENDING
-- [ ] Test cron job manually - PENDING (CRITICAL)
+- [x] Test Google Calendar connection - WORKING (needs verification)
+- [x] Test calendar sync - PASSED (appointments synced)
+- [x] Test cron job manually - PASSED (sent: 1, failed: 0)
 - [ ] Monitor error logs
 - [ ] Set up uptime monitoring
 
 ---
 
 ## Future Improvements Roadmap
+
+### URGENT - Pre-Launch Fixes
+| Task | Priority | Notes |
+|------|----------|-------|
+| Google OAuth verification | CRITICAL | Remove "unverified app" warning - submit for Google verification |
+| Logo & Branding | HIGH | Create logo, add to Clerk, Stripe, Google OAuth popup |
+| App design | HIGH | Currently black & white - needs color/polish |
+| Google Cloud - add legal links | HIGH | Add Privacy Policy & Terms to OAuth consent screen |
+| Stripe billing portal text | MEDIUM | Shows "SaaSyful LLC" - either explain or change in Stripe |
+| Payment success confetti | MEDIUM | Celebration animation on successful payment return |
+| Payment failed handling | MEDIUM | Error message, tips, retry guidance |
 
 ### Phase 2 - Post-Launch (Month 1-2)
 | Feature | Priority | Impact | Effort |
@@ -1104,7 +1116,7 @@ Talk soon!
 | 1.1 | Jan 15, 2025 | Production deployment complete, testing in progress |
 | 1.2 | Jan 15, 2025 | Added sales/marketing strategy, detailed roadmap, 90-day goals |
 | 1.3 | Jan 15, 2025 | Added research analysis, upgraded email campaign, reply templates |
-| 1.4 | Jan 16, 2025 | Stripe live payment tested, credits fix deployed |
+| 1.4 | Jan 16, 2025 | Stripe live payment tested, credits fix, portal confirmed |
 
 ---
 

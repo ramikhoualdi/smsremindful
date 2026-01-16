@@ -22,6 +22,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+    // Check if user has SMS credits
+    if (user.smsCreditsRemaining <= 0) {
+      // Smart error message based on subscription status
+      if (user.subscriptionStatus === 'trial') {
+        return NextResponse.json(
+          {
+            error: 'Your trial credits are used up. Subscribe to a plan to continue sending reminders.',
+            code: 'TRIAL_CREDITS_EXHAUSTED',
+            action: 'subscribe',
+          },
+          { status: 403 }
+        )
+      } else if (user.subscriptionStatus === 'active') {
+        return NextResponse.json(
+          {
+            error: "You've used all your credits for this billing period. Upgrade your plan for more monthly credits.",
+            code: 'PLAN_CREDITS_EXHAUSTED',
+            action: 'upgrade',
+          },
+          { status: 403 }
+        )
+      } else {
+        return NextResponse.json(
+          {
+            error: 'Your subscription is inactive. Subscribe to a plan to continue sending reminders.',
+            code: 'SUBSCRIPTION_INACTIVE',
+            action: 'subscribe',
+          },
+          { status: 403 }
+        )
+      }
+    }
+
     const body = await request.json()
     const parsed = testSMSSchema.safeParse(body)
 
@@ -73,18 +106,17 @@ export async function POST(request: NextRequest) {
     if (result.success) {
       console.log('Test SMS sent successfully:', result.sid)
 
-      // Decrement SMS credits for trial users
-      if (user.subscriptionStatus === 'trial' && user.smsCreditsRemaining > 0) {
-        await updateUser(user.id, {
-          smsCreditsRemaining: user.smsCreditsRemaining - 1,
-        })
-        console.log(`Decremented SMS credits for user ${user.id}: ${user.smsCreditsRemaining} -> ${user.smsCreditsRemaining - 1}`)
-      }
+      // Decrement SMS credits for all users
+      await updateUser(user.id, {
+        smsCreditsRemaining: user.smsCreditsRemaining - 1,
+      })
+      console.log(`Decremented SMS credits for user ${user.id}: ${user.smsCreditsRemaining} -> ${user.smsCreditsRemaining - 1}`)
 
       return NextResponse.json({
         success: true,
         message: 'Test SMS sent successfully!',
         sid: result.sid,
+        creditsRemaining: user.smsCreditsRemaining - 1,
       })
     } else {
       console.error('Test SMS failed:', result.error)

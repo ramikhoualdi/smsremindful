@@ -3,7 +3,7 @@ import { getTemplateById } from '@/features/templates/server/template-service'
 import { interpolateTemplate } from '@/features/templates/types'
 import { createSMSLog, updateSMSLogStatus } from './sms-log-service'
 import { updateAppointment } from '@/features/appointments/server/appointment-service'
-import { getUserByClerkId } from '@/features/auth/server/user-service'
+import { getUserByClerkId, updateUser } from '@/features/auth/server/user-service'
 import { format } from 'date-fns'
 import type { Appointment } from '@/features/appointments/types'
 import type { User } from '@/types/user'
@@ -18,7 +18,33 @@ export async function sendAppointmentReminder({
   appointment,
   user,
   templateId,
-}: SendReminderOptions): Promise<{ success: boolean; error?: string }> {
+}: SendReminderOptions): Promise<{ success: boolean; error?: string; code?: string; action?: string }> {
+  // Check if user has SMS credits with smart error messages
+  if (user.smsCreditsRemaining <= 0) {
+    if (user.subscriptionStatus === 'trial') {
+      return {
+        success: false,
+        error: 'Your trial credits are used up. Subscribe to a plan to continue sending reminders.',
+        code: 'TRIAL_CREDITS_EXHAUSTED',
+        action: 'subscribe',
+      }
+    } else if (user.subscriptionStatus === 'active') {
+      return {
+        success: false,
+        error: "You've used all your credits for this billing period. Upgrade your plan for more monthly credits.",
+        code: 'PLAN_CREDITS_EXHAUSTED',
+        action: 'upgrade',
+      }
+    } else {
+      return {
+        success: false,
+        error: 'Your subscription is inactive. Subscribe to a plan to continue sending reminders.',
+        code: 'SUBSCRIPTION_INACTIVE',
+        action: 'subscribe',
+      }
+    }
+  }
+
   // Validate phone number
   if (!appointment.patientPhone) {
     return { success: false, error: 'No phone number for this appointment' }
@@ -69,6 +95,11 @@ export async function sendAppointmentReminder({
         reminderSentAt: new Date(),
       })
 
+      // Decrement SMS credits
+      await updateUser(user.id, {
+        smsCreditsRemaining: user.smsCreditsRemaining - 1,
+      })
+
       return { success: true }
     } else {
       // Update SMS log with failure
@@ -94,8 +125,40 @@ export async function sendAppointmentReminder({
 export async function sendTestSMS(
   phoneNumber: string,
   userId: string
-): Promise<{ success: boolean; error?: string }> {
-  const testMessage = 'This is a test message from SMS Remindful. Your SMS integration is working correctly!'
+): Promise<{ success: boolean; error?: string; code?: string; action?: string; creditsRemaining?: number }> {
+  // Fetch user to check credits (userId is the clerkId/document ID)
+  const user = await getUserByClerkId(userId)
+  if (!user) {
+    return { success: false, error: 'User not found' }
+  }
+
+  // Check if user has SMS credits with smart error messages
+  if (user.smsCreditsRemaining <= 0) {
+    if (user.subscriptionStatus === 'trial') {
+      return {
+        success: false,
+        error: 'Your trial credits are used up. Subscribe to a plan to continue sending reminders.',
+        code: 'TRIAL_CREDITS_EXHAUSTED',
+        action: 'subscribe',
+      }
+    } else if (user.subscriptionStatus === 'active') {
+      return {
+        success: false,
+        error: "You've used all your credits for this billing period. Upgrade your plan for more monthly credits.",
+        code: 'PLAN_CREDITS_EXHAUSTED',
+        action: 'upgrade',
+      }
+    } else {
+      return {
+        success: false,
+        error: 'Your subscription is inactive. Subscribe to a plan to continue sending reminders.',
+        code: 'SUBSCRIPTION_INACTIVE',
+        action: 'subscribe',
+      }
+    }
+  }
+
+  const testMessage = 'SMS Remindful: This is a test message. Your SMS integration is working correctly! Reply STOP to opt out.'
 
   try {
     const result = await sendSMS({
@@ -115,7 +178,19 @@ export async function sendTestSMS(
       sentAt: result.success ? new Date() : undefined,
     })
 
-    return { success: result.success, error: result.error }
+    if (result.success) {
+      // Decrement SMS credits
+      await updateUser(user.id, {
+        smsCreditsRemaining: user.smsCreditsRemaining - 1,
+      })
+
+      return {
+        success: true,
+        creditsRemaining: user.smsCreditsRemaining - 1,
+      }
+    }
+
+    return { success: false, error: result.error }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return { success: false, error: errorMessage }

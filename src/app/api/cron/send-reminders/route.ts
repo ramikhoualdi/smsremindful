@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
       }
       const user = userDoc.data()!
 
-      // Check if trial user has credits
-      if (user.subscriptionStatus === 'trial' && user.smsCreditsRemaining <= 0) {
+      // Check if user has credits (applies to all users)
+      if (user.smsCreditsRemaining <= 0) {
         console.log(`User ${userId} has no SMS credits remaining, skipping`)
         continue
       }
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
         // Re-check user credits (may have been decremented in this loop)
         const currentUserDoc = await getAdminDb().collection('users').doc(userId).get()
         const currentUser = currentUserDoc.data()!
-        if (currentUser.subscriptionStatus === 'trial' && currentUser.smsCreditsRemaining <= 0) {
+        if (currentUser.smsCreditsRemaining <= 0) {
           console.log(`User ${userId} ran out of credits during batch, stopping`)
           break
         }
@@ -166,11 +166,12 @@ export async function GET(request: NextRequest) {
           results.sent++
           console.log(`Reminder sent successfully: ${result.sid}`)
 
-          // Decrement SMS credits for trial users
-          if (currentUser.subscriptionStatus === 'trial' && currentUser.smsCreditsRemaining > 0) {
+          // Decrement SMS credits for all users
+          if (currentUser.smsCreditsRemaining > 0) {
             await getAdminDb().collection('users').doc(userId).update({
               smsCreditsRemaining: currentUser.smsCreditsRemaining - 1,
             })
+            console.log(`Credits decremented for user ${userId}: ${currentUser.smsCreditsRemaining} -> ${currentUser.smsCreditsRemaining - 1}`)
           }
         } else {
           results.failed++
