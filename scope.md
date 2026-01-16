@@ -301,14 +301,14 @@ CRON_SECRET=<random-string>
 
 | Plan | Monthly | Annual | SMS Credits | Target |
 |------|---------|--------|-------------|--------|
-| Solo | $49 | $39/mo | 300/month | Solo practitioners |
-| Practice | $99 | $79/mo | 800/month | Small practices |
-| Clinic | $149 | $119/mo | 2,000/month | Multi-dentist clinics |
+| Solo | $49 | $490/year | 300/month | Solo practitioners |
+| Practice | $99 | $990/year | 800/month | Small practices |
+| Clinic | $149 | $1,490/year | 2,000/month | Multi-dentist clinics |
 | Custom | Contact | Contact | Unlimited | Enterprise |
 
 **Trial:** 7 days free with 20 SMS credits (no credit card required)
 
-**Annual Discount:** 20% off monthly price
+**Annual Discount:** 2 months free (pay for 10, get 12)
 
 **Credits:** Reset monthly on subscription anniversary date (regardless of billing interval)
 

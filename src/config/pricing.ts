@@ -17,7 +17,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     name: 'Solo',
     description: 'Perfect for solo practitioners',
     monthlyPrice: 49,
-    annualPrice: 39, // ~20% off
+    annualPrice: 41, // 2 months free ($490/year)
     smsLimit: 300,
     featured: false,
     features: [
@@ -34,7 +34,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     name: 'Practice',
     description: 'Most popular - ideal for small practices',
     monthlyPrice: 99,
-    annualPrice: 79, // ~20% off
+    annualPrice: 83, // 2 months free ($990/year)
     smsLimit: 800,
     featured: true,
     features: [
@@ -51,7 +51,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     name: 'Clinic',
     description: 'For busy multi-dentist practices',
     monthlyPrice: 149,
-    annualPrice: 119, // ~20% off
+    annualPrice: 124, // 2 months free ($1,490/year)
     smsLimit: 2000,
     featured: false,
     features: [
@@ -83,8 +83,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
 ]
 
-// Annual savings percentage
-export const ANNUAL_SAVINGS_PERCENT = 20
+// Annual savings (2 months free = ~17% off)
+export const ANNUAL_SAVINGS_PERCENT = 17
 
 // Contact email for custom plan
 export const CUSTOM_PLAN_EMAIL = 'rami@smsremindful.com'
