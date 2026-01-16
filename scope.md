@@ -1,7 +1,7 @@
 # SMS Remindful - Complete Project Scope
 
-**Document Version:** 1.5
-**Last Updated:** January 16, 2025
+**Document Version:** 1.6
+**Last Updated:** January 17, 2025
 **Status:** DEPLOYED TO PRODUCTION - Final Testing in Progress
 
 ---
@@ -301,9 +301,9 @@ CRON_SECRET=<random-string>
 
 | Plan | Monthly | Annual | SMS Credits | Target |
 |------|---------|--------|-------------|--------|
-| Solo | $39 | $31.20/mo | 300/month | Solo practitioners |
-| Practice | $69 | $55.20/mo | 750/month | Small practices |
-| Clinic | $119 | $95.20/mo | 2,000/month | Multi-dentist clinics |
+| Solo | $49 | $39/mo | 300/month | Solo practitioners |
+| Practice | $99 | $79/mo | 800/month | Small practices |
+| Clinic | $149 | $119/mo | 2,000/month | Multi-dentist clinics |
 | Custom | Contact | Contact | Unlimited | Enterprise |
 
 **Trial:** 7 days free with 20 SMS credits (no credit card required)
@@ -612,7 +612,7 @@ Worth a quick chat?
 
 [Your name]
 
-P.S. No contracts, starts at $39/month, 7-day free trial.
+P.S. No contracts, starts at $49/month, 7-day free trial.
 ```
 
 ---
@@ -827,7 +827,7 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://smsremindful.com/api/cron/s
 | Solutionreach | $329/month | Enterprise features |
 | RevenueWell | $189/month | Marketing + software |
 | ReminderDental | $50/month | Closest competitor |
-| **SMS Remindful** | **$39-119/month** | **5-8x cheaper** |
+| **SMS Remindful** | **$49-149/month** | **5-7x cheaper** |
 
 **Positioning:** You're 5-8x cheaper than Weave/Solutionreach. This is your KILLER angle. Small practices can't afford $300+/month. You're the affordable solution that does the ONE thing they actually need.
 
@@ -927,7 +927,7 @@ Worth a 10-min call to see if it'd help?
 
 — Rami
 
-P.S. It's $39/month, not $300+ like the big guys.
+P.S. It's $49/month, not $300+ like the big guys.
 ```
 
 **Why it works:**
@@ -948,7 +948,7 @@ Hey {{first_name}},
 
 Floating this back up — saw you're in {{city}} and figured this might be useful.
 
-Most dental practices spend $300+/month on patient communication software. Mine does one thing really well (SMS reminders) for $39/month.
+Most dental practices spend $300+/month on patient communication software. Mine does one thing really well (SMS reminders) for $49/month.
 
 Worth a quick look?
 
@@ -1002,7 +1002,7 @@ This is my last email — I promise.
 If you ever want to stop losing $500+/week to no-shows, the offer stands:
 
 - 7-day free trial
-- $39/month (not $300+ like Weave)
+- $49/month (not $300+ like Weave)
 - Set up in 10 minutes
 
 Just reply "interested" and I'll send you the link.
@@ -1039,9 +1039,9 @@ Or if you'd rather I walk you through it, grab a time here: [Calendly link]
 ```
 Great question!
 
-$39/month for 300 SMS (Solo plan)
-$69/month for 750 SMS (most popular)
-$119/month for 2,000 SMS
+$49/month for 300 SMS (Solo plan)
+$99/month for 800 SMS (most popular)
+$149/month for 2,000 SMS
 
 No contracts, cancel anytime. Compare that to Weave at $300+/month or Solutionreach at $329/month.
 
@@ -1131,6 +1131,7 @@ Talk soon!
 | 1.3 | Jan 15, 2025 | Added research analysis, upgraded email campaign, reply templates |
 | 1.4 | Jan 16, 2025 | Stripe live payment tested, credits fix, portal confirmed |
 | 1.5 | Jan 16, 2025 | Added onboarding wizard (3-step flow), SMS 0-credit enforcement, smart error messages |
+| 1.6 | Jan 17, 2025 | Updated pricing: Solo $49, Practice $99, Clinic $149 (was $39/$69/$119). Added no-show cost calculator page improvements, blog with research posts, reframed comparison section |
 
 ---
 
