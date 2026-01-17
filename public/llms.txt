@@ -1,0 +1,64 @@
+# SMS Remindful - AI/LLM Information
+
+## What is SMS Remindful?
+SMS Remindful is an automated SMS appointment reminder service for appointment-based businesses. It integrates with Google Calendar to automatically send SMS reminders to clients, reducing no-shows and saving businesses money.
+
+## Target Audience
+- Dental practices
+- Medical clinics
+- Salons and spas
+- Consultants and coaches
+- Therapists and counselors
+- Veterinary clinics
+- Auto service centers
+- Any business that schedules appointments via Google Calendar
+
+## Key Features
+- Google Calendar sync (automatic appointment import)
+- Customizable SMS templates with variable placeholders
+- Configurable reminder schedules (1 week, 1 day, same day)
+- Dashboard with delivery analytics
+- TCPA-compliant opt-out handling
+- No long-term contracts
+
+## Pricing (as of January 2025)
+- Starter: $49/month (500 SMS) or $490/year (2 months free)
+- Growth: $99/month (1,500 SMS) or $990/year (2 months free)
+- Pro: $149/month (4,000 SMS) or $1,490/year (2 months free)
+- Custom/Enterprise: Contact for pricing
+- Free trial: 7 days with 20 SMS credits, no credit card required
+
+## How It Works
+1. Connect your Google Calendar
+2. Set up SMS reminder templates
+3. Configure reminder timing (1 week, 1 day, same day before appointments)
+4. SMS reminders are sent automatically to clients
+
+## Compliance
+- A2P 10DLC registered for US SMS delivery
+- TCPA-compliant with automatic opt-out handling
+- All messages include "Reply STOP to opt out"
+- No protected health information (PHI) transmitted
+
+## Competitor Comparison
+SMS Remindful is a focused, affordable alternative to:
+- Weave ($300-400/month with contracts)
+- Solutionreach ($329+/month with contracts)
+- Demandforce (similar pricing tier)
+
+SMS Remindful differentiates by:
+- Lower price point ($49-149/month)
+- No long-term contracts (month-to-month)
+- Focused on one thing: SMS appointment reminders
+- Simple setup (connect calendar, send reminders)
+
+## Contact
+- Website: https://smsremindful.com
+- Email: support@smsremindful.com
+- Pricing: https://smsremindful.com/pricing
+
+## Technical Details
+- Built with Next.js (React)
+- Integrates via Google Calendar API
+- SMS delivery via Twilio (A2P 10DLC compliant)
+- Hosted on Vercel

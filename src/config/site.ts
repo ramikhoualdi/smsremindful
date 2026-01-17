@@ -4,7 +4,7 @@
 export const siteConfig = {
   name: 'SMS Remindful',
   description:
-    'Never miss another patient appointment. Automated SMS reminders for your dental practice.',
+    'Reduce no-shows with automated SMS appointment reminders. Syncs with Google Calendar. Perfect for dental practices, salons, coaches, consultants, and any appointment-based business.',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://smsremindful.com',
   ogImage: '/og-image.png',
   links: {
@@ -15,10 +15,14 @@ export const siteConfig = {
   keywords: [
     'SMS reminders',
     'appointment reminders',
-    'dental practice',
-    'dentist software',
-    'patient reminders',
+    'reduce no-shows',
     'automated SMS',
+    'Google Calendar reminders',
+    'appointment reminder software',
+    'dental appointment reminders',
+    'salon appointment reminders',
+    'client reminders',
+    'booking reminders',
   ] as string[],
 }
 

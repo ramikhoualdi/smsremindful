@@ -196,6 +196,33 @@ input[type="range"]:focus {
   outline: none;
 }
 
+/* Accordion Animations */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
+}
+
 input[type="range"]:focus::-webkit-slider-thumb {
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.25);
 }

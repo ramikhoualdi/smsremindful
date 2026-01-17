@@ -1,33 +1,33 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Free No-Show Cost Calculator for Dental Practices | SMS Remindful',
+  title: 'Free No-Show Cost Calculator | SMS Remindful',
   description:
-    'Calculate how much patient no-shows cost your dental practice annually. Free ROI calculator shows potential savings with automated SMS appointment reminders. Reduce no-shows by 30-50%.',
+    'Calculate how much appointment no-shows cost your business annually. Free ROI calculator shows potential savings with automated SMS reminders. Works for dental, salons, coaches, and any appointment-based business.',
   keywords: [
-    'dental no-show calculator',
-    'patient no-show cost calculator',
-    'dental appointment reminder ROI',
-    'dental practice revenue loss',
+    'no-show cost calculator',
+    'appointment no-show calculator',
+    'appointment reminder ROI',
+    'business revenue loss calculator',
     'SMS reminder savings calculator',
-    'reduce dental no-shows',
+    'reduce appointment no-shows',
     'appointment reminder software cost',
-    'dental practice management',
-    'patient appointment reminders',
-    'dental office no-show rate',
+    'client appointment reminders',
+    'missed appointment calculator',
+    'no-show rate calculator',
   ],
   openGraph: {
-    title: 'Free No-Show Cost Calculator for Dental Practices',
+    title: 'Free No-Show Cost Calculator',
     description:
-      'Calculate how much patient no-shows cost your dental practice. See potential savings with SMS reminders.',
+      'Calculate how much appointment no-shows cost your business. See potential savings with SMS reminders.',
     type: 'website',
     url: 'https://smsremindful.com/no-show-cost-calculator',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free No-Show Cost Calculator for Dental Practices',
+    title: 'Free No-Show Cost Calculator',
     description:
-      'Calculate how much patient no-shows cost your dental practice. See potential savings with SMS reminders.',
+      'Calculate how much appointment no-shows cost your business. See potential savings with SMS reminders.',
   },
   alternates: {
     canonical: 'https://smsremindful.com/no-show-cost-calculator',
