@@ -1,4 +1,4 @@
-export type PlanId = 'solo' | 'practice' | 'clinic' | 'custom'
+export type PlanId = 'starter' | 'growth' | 'pro' | 'custom'
 
 export interface PricingPlan {
   id: PlanId
@@ -13,9 +13,9 @@ export interface PricingPlan {
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
-    id: 'solo',
-    name: 'Solo',
-    description: 'Perfect for solo practitioners',
+    id: 'starter',
+    name: 'Starter',
+    description: 'Perfect for solo professionals',
     monthlyPrice: 49,
     annualPrice: 41, // 2 months free ($490/year)
     smsLimit: 300,
@@ -30,9 +30,9 @@ export const PRICING_PLANS: PricingPlan[] = [
     ],
   },
   {
-    id: 'practice',
-    name: 'Practice',
-    description: 'Most popular - ideal for small practices',
+    id: 'growth',
+    name: 'Growth',
+    description: 'Most popular - for growing businesses',
     monthlyPrice: 99,
     annualPrice: 83, // 2 months free ($990/year)
     smsLimit: 800,
@@ -47,9 +47,9 @@ export const PRICING_PLANS: PricingPlan[] = [
     ],
   },
   {
-    id: 'clinic',
-    name: 'Clinic',
-    description: 'For busy multi-dentist practices',
+    id: 'pro',
+    name: 'Pro',
+    description: 'For busy teams and high volume',
     monthlyPrice: 149,
     annualPrice: 124, // 2 months free ($1,490/year)
     smsLimit: 2000,

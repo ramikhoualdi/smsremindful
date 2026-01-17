@@ -13,22 +13,22 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Price IDs for subscriptions (set these in your .env after creating in Stripe Dashboard)
 // Format: price_xxxxx from Stripe
 export const STRIPE_PRICES = {
-  // Solo plan
-  solo_monthly: process.env.STRIPE_PRICE_SOLO_MONTHLY || '',
-  solo_annual: process.env.STRIPE_PRICE_SOLO_ANNUAL || '',
-  // Practice plan
-  practice_monthly: process.env.STRIPE_PRICE_PRACTICE_MONTHLY || '',
-  practice_annual: process.env.STRIPE_PRICE_PRACTICE_ANNUAL || '',
-  // Clinic plan
-  clinic_monthly: process.env.STRIPE_PRICE_CLINIC_MONTHLY || '',
-  clinic_annual: process.env.STRIPE_PRICE_CLINIC_ANNUAL || '',
+  // Starter plan
+  starter_monthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || '',
+  starter_annual: process.env.STRIPE_PRICE_STARTER_ANNUAL || '',
+  // Growth plan
+  growth_monthly: process.env.STRIPE_PRICE_GROWTH_MONTHLY || '',
+  growth_annual: process.env.STRIPE_PRICE_GROWTH_ANNUAL || '',
+  // Pro plan
+  pro_monthly: process.env.STRIPE_PRICE_PRO_MONTHLY || '',
+  pro_annual: process.env.STRIPE_PRICE_PRO_ANNUAL || '',
 } as const
 
 export type PriceKey = keyof typeof STRIPE_PRICES
 
 // Helper to get price ID from plan and billing period
 export function getPriceId(
-  plan: 'solo' | 'practice' | 'clinic',
+  plan: 'starter' | 'growth' | 'pro',
   billingPeriod: 'monthly' | 'annual'
 ): string {
   const key = `${plan}_${billingPeriod}` as PriceKey

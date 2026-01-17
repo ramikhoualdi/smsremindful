@@ -185,12 +185,12 @@ function getPlanFromPriceId(priceId: string | undefined): PlanId | undefined {
   if (!priceId) return undefined
 
   const priceToPlans: Record<string, PlanId> = {
-    [process.env.STRIPE_PRICE_SOLO_MONTHLY || '']: 'solo',
-    [process.env.STRIPE_PRICE_SOLO_ANNUAL || '']: 'solo',
-    [process.env.STRIPE_PRICE_PRACTICE_MONTHLY || '']: 'practice',
-    [process.env.STRIPE_PRICE_PRACTICE_ANNUAL || '']: 'practice',
-    [process.env.STRIPE_PRICE_CLINIC_MONTHLY || '']: 'clinic',
-    [process.env.STRIPE_PRICE_CLINIC_ANNUAL || '']: 'clinic',
+    [process.env.STRIPE_PRICE_STARTER_MONTHLY || '']: 'starter',
+    [process.env.STRIPE_PRICE_STARTER_ANNUAL || '']: 'starter',
+    [process.env.STRIPE_PRICE_GROWTH_MONTHLY || '']: 'growth',
+    [process.env.STRIPE_PRICE_GROWTH_ANNUAL || '']: 'growth',
+    [process.env.STRIPE_PRICE_PRO_MONTHLY || '']: 'pro',
+    [process.env.STRIPE_PRICE_PRO_ANNUAL || '']: 'pro',
   }
 
   return priceToPlans[priceId]

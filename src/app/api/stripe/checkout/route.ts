@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { plan, billingPeriod } = body as {
-      plan: 'solo' | 'practice' | 'clinic'
+      plan: 'starter' | 'growth' | 'pro'
       billingPeriod: 'monthly' | 'annual'
     }
 

@@ -284,12 +284,12 @@ STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 
 # Stripe Price IDs
-STRIPE_PRICE_SOLO_MONTHLY=price_...
-STRIPE_PRICE_SOLO_ANNUAL=price_...
-STRIPE_PRICE_PRACTICE_MONTHLY=price_...
-STRIPE_PRICE_PRACTICE_ANNUAL=price_...
-STRIPE_PRICE_CLINIC_MONTHLY=price_...
-STRIPE_PRICE_CLINIC_ANNUAL=price_...
+STRIPE_PRICE_STARTER_MONTHLY=price_...
+STRIPE_PRICE_STARTER_ANNUAL=price_...
+STRIPE_PRICE_GROWTH_MONTHLY=price_...
+STRIPE_PRICE_GROWTH_ANNUAL=price_...
+STRIPE_PRICE_PRO_MONTHLY=price_...
+STRIPE_PRICE_PRO_ANNUAL=price_...
 
 # Cron Security
 CRON_SECRET=<random-string>
@@ -301,9 +301,9 @@ CRON_SECRET=<random-string>
 
 | Plan | Monthly | Annual | SMS Credits | Target |
 |------|---------|--------|-------------|--------|
-| Solo | $49 | $490/year | 300/month | Solo practitioners |
-| Practice | $99 | $990/year | 800/month | Small practices |
-| Clinic | $149 | $1,490/year | 2,000/month | Multi-dentist clinics |
+| Starter | $49 | $490/year | 300/month | Solo professionals |
+| Growth | $99 | $990/year | 800/month | Growing businesses |
+| Pro | $149 | $1,490/year | 2,000/month | High-volume teams |
 | Custom | Contact | Contact | Unlimited | Enterprise |
 
 **Trial:** 7 days free with 20 SMS credits (no credit card required)
@@ -396,7 +396,7 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://smsremindful.com/api/cron/s
 - Firestore indexes deployed
 
 ### Stripe (Payments)
-- Production products created (Solo, Practice, Clinic)
+- Production products created (Starter, Growth, Pro)
 - All 6 production price IDs added to Vercel env vars
 - Production webhook configured: `https://smsremindful.com/api/webhooks/stripe`
 - Webhook signing secret added to Vercel
@@ -1039,9 +1039,9 @@ Or if you'd rather I walk you through it, grab a time here: [Calendly link]
 ```
 Great question!
 
-$49/month for 300 SMS (Solo plan)
-$99/month for 800 SMS (most popular)
-$149/month for 2,000 SMS
+$49/month for 300 SMS (Starter plan)
+$99/month for 800 SMS (Growth - most popular)
+$149/month for 2,000 SMS (Pro)
 
 No contracts, cancel anytime. Compare that to Weave at $300+/month or Solutionreach at $329/month.
 
@@ -1131,7 +1131,7 @@ Talk soon!
 | 1.3 | Jan 15, 2025 | Added research analysis, upgraded email campaign, reply templates |
 | 1.4 | Jan 16, 2025 | Stripe live payment tested, credits fix, portal confirmed |
 | 1.5 | Jan 16, 2025 | Added onboarding wizard (3-step flow), SMS 0-credit enforcement, smart error messages |
-| 1.6 | Jan 17, 2025 | Updated pricing: Solo $49, Practice $99, Clinic $149 (was $39/$69/$119). Added no-show cost calculator page improvements, blog with research posts, reframed comparison section |
+| 1.6 | Jan 17, 2025 | Updated pricing to $49/$99/$149. Renamed plans: Solo→Starter, Practice→Growth, Clinic→Pro. Added no-show cost calculator improvements, blog with research posts, reframed comparison section |
 
 ---
 
