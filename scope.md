@@ -519,6 +519,114 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://smsremindful.com/api/cron/s
 | Payment success confetti | MEDIUM | Celebration animation on successful payment return |
 | Payment failed handling | MEDIUM | Error message, tips, retry guidance |
 
+---
+
+### AI/SEO Visibility & Conversion Optimization
+
+#### Critical (Do First)
+| Task | Status | Notes |
+|------|--------|-------|
+| Create public /pricing page | [x] DONE | With FAQ accordion, competitor comparison |
+| Add Product schema (JSON-LD) | [x] DONE | StructuredData.tsx created |
+| Add FAQ schema (JSON-LD) | [x] DONE | StructuredData.tsx created |
+| Create robots.txt | [x] DONE | AI crawlers (GPTBot, ClaudeBot, PerplexityBot) allowed |
+| Create sitemap.xml | [x] DONE | Dynamic sitemap.ts with all public pages |
+| Add meta tags to all pages | [x] DONE | Title, description, OG tags configured |
+
+#### Important (Do Soon)
+| Task | Status | Notes |
+|------|--------|-------|
+| Create llms.txt | [x] DONE | Product info for AI discoverability |
+| Create /compare page | [x] DONE | SMS Remindful vs Weave, Solutionreach with feature table |
+| Create /features page | [x] DONE | Core features, coming soon, all plans include |
+| Create /faq standalone page | [x] DONE | All FAQs with categories and JSON-LD schema |
+| Add "Best For / Not For" section | [x] DONE | Added to /compare page |
+| Add Organization schema | [x] DONE | OrganizationSchema.tsx in layout |
+
+#### Landing Page Conversion
+| Task | Status | Notes |
+|------|--------|-------|
+| Hero section optimization | [x] DONE | Trust badge, price anchor, dual CTAs, trust signals |
+| Social proof section | [x] DONE | Stats: 30-50% fewer no-shows, $200+ saved, 5 min setup, 24/7 |
+| "How It Works" section | [x] DONE | 3 steps with icons (Calendar, MessageSquare, Zap) |
+| Benefits (not features) framing | [x] DONE | 4 benefit cards with outcomes |
+| Pricing preview on homepage | [x] DONE | 3 tiers with "View Full Pricing" CTA |
+| Final CTA section | [x] DONE | Strong close with calculator link, trust signals |
+| "Perfect For" industries section | [x] DONE | 10 industry badges |
+| Full footer with navigation | [x] DONE | Product, Resources, Legal columns |
+
+#### Technical SEO
+| Task | Status | Notes |
+|------|--------|-------|
+| Create OG image (1200x630) | [ ] | For social sharing - user to design |
+| Create logo + favicon | [ ] | Branding assets - user to design |
+| Performance < 3s load time | [ ] | Optimize images (WebP), lazy load |
+| Mobile responsive check | [ ] | All pages, thumb-friendly CTAs |
+| Accessibility audit | [ ] | Heading hierarchy, alt text, contrast |
+
+#### Schema Data to Implement
+
+**Product/Software Schema (homepage + pricing):**
+- @type: SoftwareApplication
+- name, description, url, image
+- offers array (Free Trial, Starter, Growth, Pro)
+- featureList array
+- author: SaaSyful LLC
+
+**FAQ Schema (pricing + FAQ pages):**
+- What calendars does SMS Remindful support?
+- How much does SMS Remindful cost?
+- Does SMS Remindful support two-way SMS?
+- Is SMS Remindful HIPAA compliant?
+- What happens if I exceed my SMS limit?
+- Can I cancel my subscription anytime?
+- How does SMS Remindful compare to Weave?
+- What industries can use SMS Remindful?
+
+**Organization Schema (all pages):**
+- name, url, logo, description
+- foundingDate: 2025
+- parentOrganization: SaaSyful LLC
+- contactPoint: support@smsremindful.com
+
+#### Pages to Create/Update
+| Page | Priority | Notes |
+|------|----------|-------|
+| /pricing (public) | CRITICAL | All tiers, FAQ, schema |
+| /features | HIGH | Feature matrix, screenshots |
+| /compare | HIGH | vs Weave, Solutionreach |
+| /faq | MEDIUM | Standalone FAQ page |
+| /integrations (future) | LOW | Google Calendar details |
+
+#### robots.txt Content
+```
+User-agent: *
+Allow: /
+Sitemap: https://smsremindful.com/sitemap.xml
+
+# AI Crawlers
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Anthropic-ai
+Allow: /
+User-agent: Google-Extended
+Allow: /
+```
+
+#### llms.txt Summary
+- Product overview and pricing
+- Key features and how it works
+- Best for / Not ideal for
+- Competitor comparison
+- Links to key pages
+- Contact info
+
+---
+
 ### Phase 2 - Post-Launch (Month 1-2)
 | Feature | Priority | Impact | Effort |
 |---------|----------|--------|--------|
@@ -1132,6 +1240,8 @@ Talk soon!
 | 1.4 | Jan 16, 2025 | Stripe live payment tested, credits fix, portal confirmed |
 | 1.5 | Jan 16, 2025 | Added onboarding wizard (3-step flow), SMS 0-credit enforcement, smart error messages |
 | 1.6 | Jan 17, 2025 | Updated pricing to $49/$99/$149. Renamed plans: Solo→Starter, Practice→Growth, Clinic→Pro. Added no-show cost calculator improvements, blog with research posts, reframed comparison section |
+| 1.7 | Jan 17, 2025 | Completed AI/SEO tasks: public /pricing page with accordion FAQ, robots.txt, sitemap.ts, meta tags, JSON-LD schemas (StructuredData.tsx), llms.txt. Made product generic for all appointment-based businesses |
+| 1.8 | Jan 17, 2025 | Completed all AI/SEO and landing page tasks: /features page, /faq page with schema, /compare page, Organization schema, completely redesigned homepage with hero, stats, how it works, benefits, industries, pricing preview, and CTA sections |
 
 ---
 
