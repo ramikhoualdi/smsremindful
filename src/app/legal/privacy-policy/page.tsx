@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
           <li><strong>Appointment data:</strong> Synced appointments are retained while your account is active</li>
         </ul>
         <p className="mt-3">
-          You may request deletion of your data at any time by contacting us at support@smsremindful.com.
+          You may request deletion of your data at any time by contacting us at hey@smsremindful.com.
           Upon account deletion, we will delete your personal data within 30 days, except where retention
           is required by law.
         </p>
@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
           <li>Cancel your subscription and close your account</li>
         </ul>
         <p className="mt-3">
-          To exercise these rights, contact us at support@smsremindful.com.
+          To exercise these rights, contact us at hey@smsremindful.com.
         </p>
       </Section>
 
@@ -240,7 +240,7 @@ export default function PrivacyPolicyPage() {
           <li>The right to non-discrimination for exercising your privacy rights</li>
         </ul>
         <p className="mt-3">
-          To exercise these rights, contact us at support@smsremindful.com.
+          To exercise these rights, contact us at hey@smsremindful.com.
         </p>
       </Section>
 
@@ -261,19 +261,16 @@ export default function PrivacyPolicyPage() {
       <Section title="17. Contact Us">
         <p>
           If you have questions about this Privacy Policy or our data practices, please contact us at:{' '}
-          <a href="mailto:support@smsremindful.com" className="text-primary underline hover:no-underline">
-            support@smsremindful.com
+          <a href="mailto:hey@smsremindful.com" className="text-primary underline hover:no-underline">
+            hey@smsremindful.com
           </a>
         </p>
         <p className="mt-3 text-sm">
           SaaSyful LLC<br />
-          Email: support@smsremindful.com
+          Email: hey@smsremindful.com
         </p>
       </Section>
 
-      <div className="border-t pt-6 mt-8 text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} SaaSyful LLC. All rights reserved.</p>
-      </div>
     </div>
   )
 }

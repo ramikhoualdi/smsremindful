@@ -7,6 +7,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   title: 'FAQ - Frequently Asked Questions',
@@ -188,7 +190,9 @@ export default function FAQPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <main className="min-h-screen">
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1">
         {/* Hero Section */}
         <section className="px-6 py-16 md:py-20 bg-gradient-to-b from-muted/50 to-background">
           <div className="mx-auto max-w-3xl text-center">
@@ -199,10 +203,10 @@ export default function FAQPage() {
               Everything you need to know about SMS Remindful. Can&apos;t find
               what you&apos;re looking for? Email us at{' '}
               <a
-                href="mailto:support@smsremindful.com"
+                href="mailto:hey@smsremindful.com"
                 className="underline hover:text-foreground"
               >
-                support@smsremindful.com
+                hey@smsremindful.com
               </a>
             </p>
           </div>
@@ -243,7 +247,7 @@ export default function FAQPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild>
-                <a href="mailto:support@smsremindful.com">Email Support</a>
+                <a href="mailto:hey@smsremindful.com">Email Support</a>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/sign-up">Start Free Trial</Link>
@@ -251,7 +255,9 @@ export default function FAQPage() {
             </div>
           </div>
         </section>
-      </main>
+        </main>
+        <Footer />
+      </div>
     </>
   )
 }

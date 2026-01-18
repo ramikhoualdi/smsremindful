@@ -218,19 +218,16 @@ export default function TermsOfServicePage() {
       <Section title="20. Contact Us">
         <p>
           If you have any questions about these Terms, please contact us at:{' '}
-          <a href="mailto:support@smsremindful.com" className="text-primary underline hover:no-underline">
-            support@smsremindful.com
+          <a href="mailto:hey@smsremindful.com" className="text-primary underline hover:no-underline">
+            hey@smsremindful.com
           </a>
         </p>
         <p className="mt-3 text-sm">
           SaaSyful LLC<br />
-          Email: support@smsremindful.com
+          Email: hey@smsremindful.com
         </p>
       </Section>
 
-      <div className="border-t pt-6 mt-8 text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} SaaSyful LLC. All rights reserved.</p>
-      </div>
     </div>
   )
 }

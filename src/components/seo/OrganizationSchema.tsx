@@ -14,7 +14,7 @@ export function OrganizationSchema() {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'support@smsremindful.com',
+      email: 'hey@smsremindful.com',
       contactType: 'customer support',
     },
     sameAs: [],

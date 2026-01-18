@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -30,6 +31,13 @@ export function Sidebar() {
     <aside className="hidden md:flex w-64 flex-col border-r bg-muted/30">
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/" className="flex items-center gap-2 cursor-pointer">
+          <Image
+            src="/logo.png"
+            alt="SMS Remindful"
+            width={28}
+            height={28}
+            className="rounded-lg object-contain"
+          />
           <span className="text-lg font-bold">SMS Remindful</span>
         </Link>
       </div>
@@ -85,6 +93,13 @@ export function MobileSidebar() {
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <div className="flex h-16 items-center border-b px-6">
           <Link href="/" className="flex items-center gap-2 cursor-pointer" onClick={() => setOpen(false)}>
+            <Image
+              src="/logo.png"
+              alt="SMS Remindful"
+              width={28}
+              height={28}
+              className="rounded-lg object-contain"
+            />
             <span className="text-lg font-bold">SMS Remindful</span>
           </Link>
         </div>

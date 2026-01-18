@@ -3,8 +3,9 @@
 
 export const siteConfig = {
   name: 'SMS Remindful',
+  ogTitle: 'SMS Remindful - Automated SMS Appointment Reminders', // 51 chars (optimal: 50-60)
   description:
-    'Reduce no-shows with automated SMS appointment reminders. Syncs with Google Calendar. Perfect for dental practices, salons, coaches, consultants, and any appointment-based business.',
+    'Reduce no-shows by up to 50% with automated SMS reminders. Syncs with Google Calendar. Perfect for any appointment-based business.', // 131 chars (optimal: 110-160)
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://smsremindful.com',
   ogImage: '/og-image.png',
   links: {

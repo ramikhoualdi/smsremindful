@@ -147,14 +147,14 @@ export function OrganizationStructuredData() {
     url: 'https://smsremindful.com',
     logo: 'https://smsremindful.com/logo.png',
     description: 'Automated SMS appointment reminder software to reduce no-shows',
-    foundingDate: '2025',
+    foundingDate: '2026',
     parentOrganization: {
       '@type': 'Organization',
       name: 'SaaSyful LLC',
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'support@smsremindful.com',
+      email: 'hey@smsremindful.com',
       contactType: 'customer support',
     },
   }

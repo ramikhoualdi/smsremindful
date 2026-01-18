@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getBlogPost, getAllBlogPosts } from '@/features/blog/posts'
 import { BlogContent } from '@/features/blog/types'
+import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
 interface BlogPostPageProps {
@@ -167,17 +168,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <article className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
-        {/* Navigation */}
-        <nav className="mb-8">
-          <Link
-            href="/blog"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← Back to Blog
-          </Link>
-        </nav>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1 bg-background">
+        <article className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
+          {/* Navigation */}
+          <nav className="mb-8">
+            <Link
+              href="/blog"
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              ← Back to Blog
+            </Link>
+          </nav>
 
         {/* Header */}
         <header className="mb-10">
@@ -224,8 +227,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </Link>
         </section>
 
-        <Footer />
-      </article>
-    </main>
+        </article>
+      </main>
+      <Footer />
+    </div>
   )
 }

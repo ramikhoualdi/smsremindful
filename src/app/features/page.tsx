@@ -13,6 +13,9 @@ import {
   Zap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { CTASection } from '@/components/layout/CTASection'
 
 export const metadata: Metadata = {
   title: 'Features - Automated SMS Appointment Reminders',
@@ -123,7 +126,7 @@ const additionalFeatures = [
   },
   {
     icon: Settings,
-    title: 'Clinic Profile',
+    title: 'Business Profile',
     description:
       'Configure your business name, phone, and address for personalized messages.',
   },
@@ -154,7 +157,9 @@ const comingSoonFeatures = [
 
 export default function FeaturesPage() {
   return (
-    <main className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1">
       {/* Hero Section */}
       <section className="px-6 py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background">
         <div className="mx-auto max-w-4xl text-center">
@@ -299,34 +304,13 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="px-6 py-16 bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Automate Your Reminders?
-          </h2>
-          <p className="text-lg opacity-90 mb-8">
-            Join businesses that have reduced no-shows by up to 50% with
-            automated SMS reminders.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/sign-up">Start Free Trial</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <Link href="/compare">Compare Solutions</Link>
-            </Button>
-          </div>
-          <p className="text-sm mt-6 opacity-75">
-            7-day free trial with 20 SMS credits. No credit card required.
-          </p>
-        </div>
-      </section>
-    </main>
+      <CTASection
+        title="Ready to Automate Your Reminders?"
+        description="Join businesses that have reduced no-shows by up to 50% with automated SMS reminders."
+        secondaryCta={{ text: 'Compare Solutions', href: '/compare' }}
+      />
+      </main>
+      <Footer />
+    </div>
   )
 }

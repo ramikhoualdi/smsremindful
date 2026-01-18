@@ -1,7 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import {
   Calendar,
   MessageSquare,
@@ -14,6 +13,9 @@ import {
   Star,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { CTASection } from '@/components/layout/CTASection'
 
 export default async function HomePage() {
   const { userId } = await auth()
@@ -25,51 +27,11 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo.png"
-            alt="SMS Remindful"
-            width={32}
-            height={32}
-            className="rounded-lg object-contain"
-          />
-          <span className="text-xl font-bold">SMS Remindful</span>
-        </Link>
-        <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/features"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Features
-          </Link>
-          <Link
-            href="/pricing"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Pricing
-          </Link>
-          <Link
-            href="/faq"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            FAQ
-          </Link>
-        </nav>
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/sign-up">Start Free Trial</Link>
-          </Button>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="px-6 py-20 md:py-28">
+        <section className="px-6 py-12 md:py-20">
           <div className="mx-auto max-w-4xl text-center">
             <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-4 py-1.5 text-sm mb-6">
               <span className="relative flex h-2 w-2">
@@ -183,9 +145,8 @@ export default async function HomePage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="relative text-center p-6">
-                <div className="absolute top-6 left-1/2 w-full h-0.5 bg-border hidden md:block -translate-x-1/2 translate-x-[50%]"></div>
-                <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
+              <div className="text-center p-6">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
                   <Calendar className="h-8 w-8" />
                 </div>
                 <div className="text-sm font-medium text-primary mb-2">
@@ -198,9 +159,8 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="relative text-center p-6">
-                <div className="absolute top-6 left-1/2 w-full h-0.5 bg-border hidden md:block -translate-x-1/2 translate-x-[50%]"></div>
-                <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
+              <div className="text-center p-6">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
                   <MessageSquare className="h-8 w-8" />
                 </div>
                 <div className="text-sm font-medium text-primary mb-2">
@@ -212,8 +172,8 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="relative text-center p-6">
-                <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
+              <div className="text-center p-6">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
                   <Zap className="h-8 w-8" />
                 </div>
                 <div className="text-sm font-medium text-primary mb-2">
@@ -245,23 +205,63 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="max-w-sm mx-auto">
+            <div className="max-w-md mx-auto">
               {/* Phone mockup */}
               <div className="bg-background rounded-3xl border-4 border-foreground/10 p-4 shadow-xl">
-                <div className="bg-muted rounded-2xl p-4">
-                  {/* SMS bubble */}
-                  <div className="bg-[#34C759] text-white rounded-2xl rounded-bl-md p-4 text-sm leading-relaxed shadow-sm">
-                    <p>
-                      SMS Remindful: Hi Sarah, reminder: your appointment with{' '}
-                      <strong>Glow Spa & Wellness</strong> is tomorrow at{' '}
-                      <strong>2:00 PM</strong>.
-                    </p>
-                    <p className="mt-2 text-white/80 text-xs">
-                      Reply STOP to opt out.
-                    </p>
+                <div className="bg-muted rounded-2xl p-3 space-y-3">
+                  {/* 1 Week reminder */}
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">1 week before</div>
+                    <div className="bg-[#34C759] text-white rounded-2xl rounded-bl-md p-3 text-sm leading-relaxed shadow-sm">
+                      <p>
+                        Hi Sarah, reminder: your appointment with{' '}
+                        <strong>Premier Services</strong> is in 1 week on{' '}
+                        <strong>Jan 24 at 2:00 PM</strong>.
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-end gap-1 mt-1 text-xs text-muted-foreground">
+                      <span>Delivered</span>
+                      <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L9.5 15.5L6 12" />
+                        <path d="M22 6L13.5 15.5L12 14" />
+                      </svg>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground mt-2 text-right">
-                    Delivered
+                  {/* 1 Day reminder */}
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">1 day before</div>
+                    <div className="bg-[#34C759] text-white rounded-2xl rounded-bl-md p-3 text-sm leading-relaxed shadow-sm">
+                      <p>
+                        Hi Sarah, reminder: your appointment with{' '}
+                        <strong>Premier Services</strong> is tomorrow at{' '}
+                        <strong>2:00 PM</strong>.
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-end gap-1 mt-1 text-xs text-muted-foreground">
+                      <span>Delivered</span>
+                      <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L9.5 15.5L6 12" />
+                        <path d="M22 6L13.5 15.5L12 14" />
+                      </svg>
+                    </div>
+                  </div>
+                  {/* Same day reminder */}
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">Same day</div>
+                    <div className="bg-[#34C759] text-white rounded-2xl rounded-bl-md p-3 text-sm leading-relaxed shadow-sm">
+                      <p>
+                        Hi Sarah, reminder: your appointment with{' '}
+                        <strong>Premier Services</strong> is today at{' '}
+                        <strong>2:00 PM</strong>. Reply STOP to opt out.
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-end gap-1 mt-1 text-xs text-muted-foreground">
+                      <span>Delivered</span>
+                      <svg className="w-4 h-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L9.5 15.5L6 12" />
+                        <path d="M22 6L13.5 15.5L12 14" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -481,151 +481,15 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="px-6 py-20 bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Reduce No-Shows?
-            </h2>
-            <p className="text-lg opacity-90 mb-8">
-              Join businesses saving time and money with automated SMS
-              reminders. Start your free trial today — no credit card required.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" variant="secondary">
-                <Link href="/sign-up">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              >
-                <Link href="/no-show-cost-calculator">
-                  Calculate Your Savings
-                </Link>
-              </Button>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm opacity-90">
-              <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4" />
-                7-day free trial
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4" />
-                20 free SMS credits
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4" />
-                No credit card required
-              </span>
-            </div>
-          </div>
-        </section>
+        <CTASection
+          description="Join businesses saving time and money with automated SMS reminders. Start your free trial today — no credit card required."
+          primaryCta={{ text: 'Start Free Trial', href: '/sign-up', showArrow: true }}
+          secondaryCta={{ text: 'Calculate Your Savings', href: '/no-show-cost-calculator' }}
+          showBulletPoints
+        />
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-12 px-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Image
-                  src="/logo.png"
-                  alt="SMS Remindful"
-                  width={28}
-                  height={28}
-                  className="rounded-lg object-contain"
-                />
-                <span className="text-lg font-bold">SMS Remindful</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Automated SMS appointment reminders for businesses that value
-                their time.
-              </p>
-            </div>
-            <div>
-              <div className="font-semibold mb-4">Product</div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/features" className="hover:text-foreground">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/pricing" className="hover:text-foreground">
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/faq" className="hover:text-foreground">
-                    FAQ
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <div className="font-semibold mb-4">Resources</div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/blog" className="hover:text-foreground">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/no-show-cost-calculator"
-                    className="hover:text-foreground"
-                  >
-                    No-Show Calculator
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <div className="font-semibold mb-4">Legal</div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link
-                    href="/legal/terms-of-service"
-                    className="hover:text-foreground"
-                  >
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/legal/privacy-policy"
-                    className="hover:text-foreground"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} SMS Remindful. All rights
-              reserved.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Questions?{' '}
-              <a
-                href="mailto:support@smsremindful.com"
-                className="underline hover:text-foreground"
-              >
-                support@smsremindful.com
-              </a>
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

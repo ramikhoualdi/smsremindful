@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Check, X, Minus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { CTASection } from '@/components/layout/CTASection'
 
 export const metadata: Metadata = {
   title: 'Compare SMS Remindful vs Weave vs Solutionreach',
@@ -135,8 +138,10 @@ function FeatureIcon({ value }: { value: boolean | string }) {
 
 export default function ComparePage() {
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1">
+        {/* Hero Section */}
       <section className="px-6 py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
@@ -406,40 +411,12 @@ export default function ComparePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="px-6 py-16 bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Reduce No-Shows?
-          </h2>
-          <p className="text-lg opacity-90 mb-8">
-            Start your free 7-day trial today. No credit card required. Set up
-            in 5 minutes.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/sign-up">Start Free Trial</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <Link href="/pricing">View Pricing</Link>
-            </Button>
-          </div>
-          <p className="text-sm mt-6 opacity-75">
-            Questions? Email us at{' '}
-            <a
-              href="mailto:support@smsremindful.com"
-              className="underline hover:no-underline"
-            >
-              support@smsremindful.com
-            </a>
-          </p>
-        </div>
-      </section>
-    </main>
+      <CTASection
+        secondaryCta={{ text: 'View Pricing', href: '/pricing' }}
+        showEmail
+      />
+      </main>
+      <Footer />
+    </div>
   )
 }

@@ -1,23 +1,24 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllBlogPosts } from '@/features/blog/posts'
+import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-  title: 'Blog | SMS Remindful - Dental Practice Insights',
+  title: 'Blog | SMS Remindful - Business Insights',
   description:
-    'Research-backed articles on reducing patient no-shows, appointment reminders, and dental practice management. Learn strategies to recover lost revenue.',
+    'Research-backed articles on reducing no-shows, appointment reminders, and practice management. Learn strategies to recover lost revenue.',
   keywords: [
-    'dental practice blog',
-    'reduce patient no-shows',
+    'appointment reminder blog',
+    'reduce no-shows',
     'appointment reminder tips',
-    'dental practice management',
+    'practice management',
     'SMS reminders research',
   ],
   openGraph: {
     title: 'Blog | SMS Remindful',
     description:
-      'Research-backed articles on reducing patient no-shows and improving dental practice efficiency.',
+      'Research-backed articles on reducing no-shows and improving business efficiency.',
     type: 'website',
     url: 'https://smsremindful.com/blog',
   },
@@ -36,24 +37,20 @@ export default function BlogPage() {
   const posts = getAllBlogPosts()
 
   return (
-    <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
-        {/* Header */}
-        <header className="text-center mb-12">
-          <Link
-            href="/"
-            className="inline-block text-sm text-muted-foreground hover:text-foreground mb-6"
-          >
-            ← Back to SMS Remindful
-          </Link>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
-            Blog
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Research-backed insights on reducing patient no-shows and improving your dental
-            practice.
-          </p>
-        </header>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1 bg-background">
+        <div className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
+          {/* Header */}
+          <header className="text-center mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
+              Blog
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Research-backed insights on reducing no-shows and improving your
+              business.
+            </p>
+          </header>
 
         {/* Blog Posts */}
         <section className="space-y-8">
@@ -95,22 +92,22 @@ export default function BlogPage() {
           ))}
         </section>
 
-        {/* CTA */}
-        <section className="mt-16 bg-foreground text-background rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-3">Ready to Reduce No-Shows?</h2>
-          <p className="text-background/70 mb-6">
-            Start your free trial and see results within the first week.
-          </p>
-          <Link
-            href="/sign-up"
-            className="inline-block px-8 py-3 text-base font-semibold text-foreground bg-background rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
-          >
-            Start Free Trial →
-          </Link>
-        </section>
-
-        <Footer />
-      </div>
-    </main>
+          {/* CTA */}
+          <section className="mt-16 bg-foreground text-background rounded-2xl p-8 text-center">
+            <h2 className="text-2xl font-bold mb-3">Ready to Reduce No-Shows?</h2>
+            <p className="text-background/70 mb-6">
+              Start your free trial and see results within the first week.
+            </p>
+            <Link
+              href="/sign-up"
+              className="inline-block px-8 py-3 text-base font-semibold text-foreground bg-background rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              Start Free Trial →
+            </Link>
+          </section>
+        </div>
+      </main>
+      <Footer />
+    </div>
   )
 }

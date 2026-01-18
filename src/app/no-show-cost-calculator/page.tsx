@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
 export default function NoShowCostCalculatorPage() {
@@ -72,8 +73,10 @@ export default function NoShowCostCalculatorPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1 bg-background">
+        <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
         {/* SEO-optimized Header */}
         <header className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full mb-6">
@@ -87,7 +90,7 @@ export default function NoShowCostCalculatorPage() {
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-lg mx-auto">
-            Calculate how much revenue your dental practice loses to patient no-shows and see your potential savings with automated SMS reminders.
+            Calculate how much revenue your business loses to no-shows and see your potential savings with automated SMS reminders.
           </p>
         </header>
 
@@ -96,7 +99,7 @@ export default function NoShowCostCalculatorPage() {
           {/* Input: Appointments per week */}
           <div className="mb-8">
             <label className="flex justify-between items-center mb-4 text-sm font-medium text-foreground">
-              <span>Weekly patient appointments</span>
+              <span>Weekly appointments</span>
               <span className="bg-muted px-3 py-1.5 rounded-lg font-semibold tabular-nums min-w-[60px] text-center">
                 {appointmentsPerWeek}
               </span>
@@ -144,7 +147,7 @@ export default function NoShowCostCalculatorPage() {
               <span>40%</span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Industry average: 10-20% for dental practices
+              Industry average: 10-20% for appointment-based businesses
             </p>
           </div>
 
@@ -174,7 +177,7 @@ export default function NoShowCostCalculatorPage() {
               <span>$500</span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Average dental appointment: $150-$300
+              Average appointment value: $100-$300
             </p>
           </div>
 
@@ -371,8 +374,9 @@ export default function NoShowCostCalculatorPage() {
           </section>
         </article>
 
-        <Footer showAbout />
-      </div>
-    </main>
+        </div>
+      </main>
+      <Footer />
+    </div>
   )
 }
