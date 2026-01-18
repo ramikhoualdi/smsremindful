@@ -1,8 +1,8 @@
 # SMS Remindful - Complete Project Scope
 
-**Document Version:** 1.6
-**Last Updated:** January 17, 2025
-**Status:** DEPLOYED TO PRODUCTION - Final Testing in Progress
+**Document Version:** 1.9
+**Last Updated:** January 18, 2025
+**Status:** LIVE IN PRODUCTION - Ready for Customers
 
 ---
 
@@ -316,36 +316,36 @@ CRON_SECRET=<random-string>
 
 ## Current Status
 
-### Production Deployment Complete
+### Production Deployment Complete - January 18, 2025
 
-The application has been deployed to production at **https://smsremindful.com**
+The application is **LIVE** at **https://smsremindful.com**
 
-### What's Working (Tested)
+### All Core Features Tested & Working
 
-| Feature | Local | Production | Notes |
-|---------|-------|------------|-------|
-| User sign up/sign in | PASSED | PASSED | Clerk production instance |
-| Google Calendar OAuth | PASSED | PASSED | Connected (needs Google verification) |
-| Calendar sync | PASSED | PASSED | Appointments synced correctly |
-| Appointment phone editing | PASSED | PENDING | Needs production test |
-| Template CRUD | PASSED | PENDING | Needs production test |
-| Test SMS sending | PASSED | PASSED | Working in production |
-| SMS credits decrement | PASSED | PENDING | Needs production test |
-| Stripe checkout | PASSED | PASSED | Live payment works, 300 credits received |
-| Stripe webhooks | PASSED | PASSED | Credits updated via webhook |
-| Stripe portal | PASSED | PASSED | Plan changes, downgrade at period end |
-| Billing page info | PASSED | PENDING | Needs production test |
+| Feature | Status | Notes |
+|---------|--------|-------|
+| User sign up/sign in | PASSED | Clerk production instance |
+| Google Calendar OAuth | PASSED | Google verification approved |
+| Calendar sync | PASSED | Appointments synced correctly |
+| Appointment phone editing | PASSED | Working in production |
+| Template CRUD | PASSED | Working in production |
+| Test SMS sending | PASSED | Working in production |
+| SMS credits decrement | PASSED | Working in production |
+| Stripe checkout | PASSED | Live payment works |
+| Stripe webhooks | PASSED | Credits updated via webhook |
+| Stripe portal | PASSED | Plan changes working |
+| Vercel Cron Job | PASSED | Manual test: checked 1, sent 1, failed 0 |
 
-### What Still Needs Production Testing
+### External Dependencies
 
-| Feature | Priority | Status | Test Plan |
-|---------|----------|--------|-----------|
-| **Vercel Cron Job** | CRITICAL | PASSED | Manual test: checked 1, sent 1, failed 0 |
-| **Stripe Live Payment** | HIGH | PASSED | Real card checkout works, 300 credits received |
-| **Google Calendar OAuth** | HIGH | PASSED | Connected, needs Google verification |
-| A2P SMS delivery | HIGH | BLOCKED | Waiting for campaign approval (2-3 weeks) |
-| Multi-user load | MEDIUM | PENDING | Multiple concurrent users |
-| Calendar sync at scale | MEDIUM | PENDING | Large appointment volumes |
+| Dependency | Status |
+|------------|--------|
+| Clerk Auth | READY |
+| Firebase | READY |
+| Google OAuth | VERIFIED by Google |
+| Twilio A2P | Campaign under review (2-3 weeks) |
+| Stripe | READY (live mode) |
+| Vercel | DEPLOYED |
 
 ### Cron Job Test Plan (CRITICAL)
 
@@ -1242,6 +1242,169 @@ Talk soon!
 | 1.6 | Jan 17, 2025 | Updated pricing to $49/$99/$149. Renamed plans: Solo→Starter, Practice→Growth, Clinic→Pro. Added no-show cost calculator improvements, blog with research posts, reframed comparison section |
 | 1.7 | Jan 17, 2025 | Completed AI/SEO tasks: public /pricing page with accordion FAQ, robots.txt, sitemap.ts, meta tags, JSON-LD schemas (StructuredData.tsx), llms.txt. Made product generic for all appointment-based businesses |
 | 1.8 | Jan 17, 2025 | Completed all AI/SEO and landing page tasks: /features page, /faq page with schema, /compare page, Organization schema, completely redesigned homepage with hero, stats, how it works, benefits, industries, pricing preview, and CTA sections |
+| 1.9 | Jan 18, 2025 | **PRODUCTION LAUNCH:** Deployed to Vercel, all features tested, Google OAuth verified, Stripe webhooks working, created reusable CTASection component, added core reliability focus, phone number handling spec, calendar integrations strategy |
+
+---
+
+## Next Steps (January 19, 2025)
+
+### Immediate Priority
+
+| Task | Priority | Notes |
+|------|----------|-------|
+| Add demo video to landing page | HIGH | Show product in action |
+| Twilio delivery status webhooks | HIGH | Know if SMS actually delivered |
+| Customer outreach begins | HIGH | Start getting customers |
+| Phone validation before sending | MEDIUM | Validate numbers are real |
+
+### Core Feature Reliability Focus
+
+**Philosophy: Perfect the core before adding new features**
+
+```
+The core must work flawlessly:
+1. Calendar sync → Works perfectly, no edge cases
+2. Templates → Variables interpolate correctly, preview matches actual SMS
+3. Scheduling → 1 week / 1 day / same day timings are precise
+4. SMS Delivery → 100% success rate (tracked with delivery webhooks)
+```
+
+**SMS Delivery - Path to 100%:**
+1. Twilio delivery webhooks - Know exactly which messages delivered/failed
+2. Retry failed sends - Auto-retry once if failed
+3. Phone validation - Verify numbers are valid before sending
+4. Dashboard alerts - Show failed deliveries prominently
+
+---
+
+## Feature Spec: Smart Phone Number Handling
+
+### Problem
+Calendars don't have a dedicated phone number field. Numbers may be in description, title, location, or nowhere.
+
+### Solution: Hybrid Approach
+
+**Priority order when appointment syncs:**
+1. **Contact Database Match** - Check if client name exists in saved contacts → Use stored phone
+2. **Smart Extraction** - Regex scan description/title/location for phone patterns → Ask user to verify
+3. **Google Contacts Lookup** - Check Google Contacts by attendee email → Ask user to verify
+4. **Manual Entry** - No phone found → Flag for user to add manually
+
+### Components to Build
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| Contact Database | Store client name + phone, reuse across appointments | High |
+| Phone Regex Parser | Extract phone patterns from event text fields | High |
+| Verification UI | "We found XXX-XXX-XXXX. Is this correct?" modal | High |
+| Google Contacts OAuth | Additional scope to read contacts | Medium |
+| CSV Import | Bulk upload name + phone pairs | Medium |
+| Client Self-Service | Email/form for client to provide their own number | Low |
+
+### Phone Extraction Patterns
+```
+Formats to detect:
+- (555) 123-4567
+- 555-123-4567
+- 555.123.4567
+- 5551234567
+- +1 555 123 4567
+- +15551234567
+
+Scan fields:
+- Event description
+- Event title
+- Location field
+- Attendee notes (if available)
+```
+
+### Contact Database Schema
+```typescript
+interface Contact {
+  id: string
+  userId: string
+  name: string           // "Sarah Johnson"
+  normalizedName: string // "sarah johnson" (for matching)
+  phone: string
+  email?: string
+  createdAt: Date
+  lastAppointment?: Date
+}
+```
+
+### User Flow
+```
+Appointment syncs → No phone in event
+↓
+Check contacts by name → Not found
+↓
+Parse event fields → Found "Call 555-1234"
+↓
+Show verification: "Is 555-1234 correct for John Smith?"
+↓
+User confirms → Save to contacts + appointment
+↓
+Future "John Smith" appointments auto-matched
+```
+
+---
+
+## Feature Spec: Calendar Integrations Strategy
+
+### Goal
+Support all major calendar platforms to maximize market reach.
+
+### Calendar Platforms to Support
+
+| Calendar | API Type | Complexity | Priority |
+|----------|----------|------------|----------|
+| Google Calendar | REST API (OAuth) | DONE | Implemented |
+| Outlook/Microsoft 365 | Microsoft Graph API | Medium | High |
+| Calendly | REST API + Webhooks | Easy | High |
+| Cal.com | REST API + Webhooks | Easy | Medium |
+| Acuity Scheduling | REST API | Easy | Medium |
+| iCloud Calendar | CalDAV (no official API) | Hard | Low |
+
+### Notes
+- **Calendly/Cal.com/Acuity** are easier than Google - they push events via webhooks
+- **iCloud** is hardest - Apple has no public API, would need CalDAV implementation
+- **Outlook** uses Microsoft Graph API - similar to Google OAuth flow
+
+---
+
+## Discussion: Why Us? (Value Proposition)
+
+### Open Questions to Explore
+- Why should a customer choose SMS Remindful?
+- What guarantees can we offer?
+- What's our availability promise?
+- How do we stand out from competitors?
+
+### Current Differentiators
+
+| Factor | Our Angle | Notes |
+|--------|-----------|-------|
+| Price | 5-7x cheaper than Weave/Solutionreach | $49 vs $300+ |
+| Simplicity | Setup in 5 minutes, no training needed | One thing done well |
+| No contracts | Month-to-month, cancel anytime | Zero risk |
+| Delivery guarantee | ??? | Need to define SLA |
+| Uptime/Availability | ??? | Need to define SLA |
+| Support | ??? | Email? Chat? Response time? |
+
+### Questions to Answer
+1. Do we offer a delivery guarantee? (e.g., "99% delivery rate or money back")
+2. Do we offer uptime SLA? (e.g., "99.9% uptime")
+3. What's our support promise? (e.g., "Response within 24 hours")
+4. Can we offer a "no no-show guarantee"? (e.g., "Reduce no-shows or refund")
+5. Free trial extension if they're not seeing results?
+
+### Messaging Ideas
+- "Set it and forget it" - fully automated
+- "We do one thing, and we do it perfectly"
+- "Your reminders, delivered. Guaranteed."
+- "The affordable alternative that actually works"
+
+*To be discussed and finalized*
 
 ---
 

@@ -95,3 +95,13 @@ export function isTwilioConfigured(): boolean {
   )
   return hasCredentials && hasSender
 }
+
+// Get the status callback URL for Twilio webhooks
+export function getTwilioStatusCallbackUrl(): string | undefined {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+  if (!siteUrl) {
+    console.warn('NEXT_PUBLIC_SITE_URL not configured, status callbacks disabled')
+    return undefined
+  }
+  return `${siteUrl}/api/webhooks/twilio`
+}

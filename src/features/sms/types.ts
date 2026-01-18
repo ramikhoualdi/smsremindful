@@ -36,6 +36,19 @@ export type ReminderSchedule = z.infer<typeof reminderScheduleSchema>
 export type CreateReminderScheduleInput = z.infer<typeof createReminderScheduleSchema>
 export type UpdateReminderScheduleInput = z.infer<typeof updateReminderScheduleSchema>
 
+// SMS Status values (matches Twilio statuses)
+export const SMS_STATUS = {
+  pending: 'pending',       // Created but not yet sent
+  queued: 'queued',         // Twilio has queued the message
+  sending: 'sending',       // Twilio is sending the message
+  sent: 'sent',             // Message sent to carrier
+  delivered: 'delivered',   // Carrier confirmed delivery
+  undelivered: 'undelivered', // Carrier couldn't deliver
+  failed: 'failed',         // Message failed to send
+} as const
+
+export type SMSStatus = keyof typeof SMS_STATUS
+
 // SMS Log Schema
 export const smsLogSchema = z.object({
   id: z.string(),
@@ -44,9 +57,11 @@ export const smsLogSchema = z.object({
   templateId: z.string().optional(),
   phoneNumber: z.string(),
   message: z.string(),
-  status: z.enum(['pending', 'sent', 'delivered', 'failed']),
+  status: z.enum(['pending', 'queued', 'sending', 'sent', 'delivered', 'undelivered', 'failed']),
   twilioSid: z.string().optional(),
   error: z.string().optional(),
+  errorCode: z.string().optional(),        // Twilio error code (e.g., "30003")
+  twilioErrorMessage: z.string().optional(), // Detailed Twilio error message
   scheduledFor: z.date().optional(),
   sentAt: z.date().optional(),
   deliveredAt: z.date().optional(),
@@ -61,9 +76,11 @@ export interface CreateSMSLogInput {
   templateId?: string
   phoneNumber: string
   message: string
-  status: 'pending' | 'sent' | 'delivered' | 'failed'
+  status: SMSStatus
   twilioSid?: string
   error?: string
+  errorCode?: string
+  twilioErrorMessage?: string
   scheduledFor?: Date
   sentAt?: Date
 }

@@ -38,6 +38,13 @@ export default async function DashboardPage() {
     (log) => log.sentAt && isToday(log.sentAt)
   ).length
 
+  // Calculate delivery rate: delivered / (delivered + undelivered + failed)
+  // Only count messages that have a final status (not pending/queued/sending/sent)
+  const finalizedMessages = smsStats.delivered + smsStats.undelivered + smsStats.failed
+  const deliveryRate = finalizedMessages > 0
+    ? Math.round((smsStats.delivered / finalizedMessages) * 100)
+    : smsStats.total > 0 ? 0 : 100 // Show 100% if no messages sent yet
+
   const stats = {
     upcomingAppointments: appointments.length,
     remindersSentToday,
@@ -45,9 +52,9 @@ export default async function DashboardPage() {
     trialDaysRemaining,
     isOnTrial,
     totalSent: smsStats.total,
-    deliveryRate: smsStats.total > 0
-      ? Math.round((smsStats.delivered / smsStats.total) * 100)
-      : 0,
+    delivered: smsStats.delivered,
+    failed: smsStats.failed + smsStats.undelivered,
+    deliveryRate,
   }
 
   return (
@@ -184,11 +191,11 @@ export default async function DashboardPage() {
                       variant={
                         log.status === 'delivered' ? 'default' :
                         log.status === 'sent' ? 'secondary' :
-                        log.status === 'failed' ? 'destructive' : 'outline'
+                        log.status === 'failed' || log.status === 'undelivered' ? 'destructive' : 'outline'
                       }
                       className="shrink-0"
                     >
-                      {log.status}
+                      {log.status === 'undelivered' ? 'failed' : log.status}
                     </Badge>
                   </div>
                 ))}

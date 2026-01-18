@@ -1,4 +1,4 @@
-import { sendSMS } from '@/lib/twilio/client'
+import { sendSMS, getTwilioStatusCallbackUrl } from '@/lib/twilio/client'
 import { getTemplateById } from '@/features/templates/server/template-service'
 import { interpolateTemplate } from '@/features/templates/types'
 import { createSMSLog, updateSMSLogStatus } from './sms-log-service'
@@ -76,10 +76,11 @@ export async function sendAppointmentReminder({
   })
 
   try {
-    // Send SMS via Twilio
+    // Send SMS via Twilio with status callback for delivery tracking
     const result = await sendSMS({
       to: appointment.patientPhone,
       body: message,
+      statusCallback: getTwilioStatusCallbackUrl(),
     })
 
     if (result.success) {
@@ -161,9 +162,11 @@ export async function sendTestSMS(
   const testMessage = 'SMS Remindful: This is a test message. Your SMS integration is working correctly! Reply STOP to opt out.'
 
   try {
+    // Send SMS with status callback for delivery tracking
     const result = await sendSMS({
       to: phoneNumber,
       body: testMessage,
+      statusCallback: getTwilioStatusCallbackUrl(),
     })
 
     // Log the test message

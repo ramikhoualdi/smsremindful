@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase/admin'
-import { sendSMS } from '@/lib/twilio/client'
+import { sendSMS, getTwilioStatusCallbackUrl } from '@/lib/twilio/client'
 import { createSMSLog } from '@/features/sms/server/sms-log-service'
 import { interpolateTemplate } from '@/features/templates/types'
 import { REMINDER_TIMINGS, type ReminderTiming } from '@/features/sms/types'
@@ -102,6 +102,13 @@ export async function GET(request: NextRequest) {
           continue
         }
 
+        // Skip if phone is validated as landline (can't receive SMS)
+        if (appointment.phoneValidated && appointment.phoneCanReceiveSMS === false) {
+          console.log(`Skipping appointment ${appointmentDoc.id}: landline phone cannot receive SMS`)
+          results.skipped++
+          continue
+        }
+
         // Normalize phone to E.164 format
         const normalizedPhone = normalizeUSPhoneNumber(appointment.patientPhone)
         if (!normalizedPhone) {
@@ -143,10 +150,11 @@ export async function GET(request: NextRequest) {
 
         console.log(`Sending reminder to ${normalizedPhone}`)
 
-        // Send SMS
+        // Send SMS with status callback for delivery tracking
         const result = await sendSMS({
           to: normalizedPhone,
           body: message,
+          statusCallback: getTwilioStatusCallbackUrl(),
         })
 
         // Log the SMS

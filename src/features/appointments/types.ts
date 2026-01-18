@@ -10,6 +10,10 @@ export const appointmentStatusSchema = z.enum([
 
 export type AppointmentStatus = z.infer<typeof appointmentStatusSchema>
 
+// Phone carrier types (from Twilio Lookup)
+export const phoneCarrierTypeSchema = z.enum(['mobile', 'landline', 'voip', 'unknown'])
+export type PhoneCarrierType = z.infer<typeof phoneCarrierTypeSchema>
+
 // Appointment schema for Firestore
 export const appointmentSchema = z.object({
   id: z.string(),
@@ -29,6 +33,11 @@ export const appointmentSchema = z.object({
   // Sync metadata
   lastSyncedAt: z.date(),
   sourceCalendar: z.enum(['google', 'outlook']).default('google'),
+  // Phone validation fields
+  phoneValidated: z.boolean().optional(),
+  phoneType: phoneCarrierTypeSchema.optional(),
+  phoneValidatedAt: z.date().optional(),
+  phoneCanReceiveSMS: z.boolean().optional(),
 })
 
 export type Appointment = z.infer<typeof appointmentSchema>

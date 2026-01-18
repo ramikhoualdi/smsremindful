@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getUserByClerkId, updateUser } from '@/features/auth/server/user-service'
-import { sendSMS } from '@/lib/twilio/client'
+import { sendSMS, getTwilioStatusCallbackUrl } from '@/lib/twilio/client'
 import { createSMSLog } from '@/features/sms/server/sms-log-service'
 import { isUSPhoneNumber, normalizeUSPhoneNumber, US_PHONE_ERROR } from '@/utils/phone'
 
@@ -86,9 +86,11 @@ export async function POST(request: NextRequest) {
 
     console.log('Sending test SMS to:', normalizedPhone)
 
+    // Send SMS with status callback for delivery tracking
     const result = await sendSMS({
       to: normalizedPhone,
       body: testMessage,
+      statusCallback: getTwilioStatusCallbackUrl(),
     })
 
     // Log the test message

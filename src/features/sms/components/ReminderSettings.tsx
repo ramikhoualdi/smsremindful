@@ -12,10 +12,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { REMINDER_TIMINGS, type ReminderSchedule, type ReminderTiming } from '../types'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { CheckCircle2, XCircle, Clock, Send, AlertCircle, Loader2 } from 'lucide-react'
+import { REMINDER_TIMINGS, type ReminderSchedule, type ReminderTiming, type SMSStatus } from '../types'
 import type { Template } from '@/features/templates/types'
 import type { SMSLog } from '../types'
 import { format } from 'date-fns'
+
+// Status configuration for display
+const STATUS_CONFIG: Record<SMSStatus, {
+  label: string
+  variant: 'default' | 'secondary' | 'destructive' | 'outline'
+  icon: React.ElementType
+  color: string
+}> = {
+  pending: { label: 'Pending', variant: 'outline', icon: Clock, color: 'text-gray-500' },
+  queued: { label: 'Queued', variant: 'outline', icon: Clock, color: 'text-blue-500' },
+  sending: { label: 'Sending', variant: 'secondary', icon: Loader2, color: 'text-blue-500' },
+  sent: { label: 'Sent', variant: 'secondary', icon: Send, color: 'text-blue-500' },
+  delivered: { label: 'Delivered', variant: 'default', icon: CheckCircle2, color: 'text-green-500' },
+  undelivered: { label: 'Undelivered', variant: 'destructive', icon: AlertCircle, color: 'text-orange-500' },
+  failed: { label: 'Failed', variant: 'destructive', icon: XCircle, color: 'text-red-500' },
+}
 
 interface ReminderSettingsProps {
   schedules: ReminderSchedule[]
@@ -269,41 +292,64 @@ export function ReminderSettings({
               No reminders have been sent yet.
             </p>
           ) : (
-            <div className="space-y-3">
-              {smsLogs.map((log) => (
-                <div
-                  key={log.id}
-                  className="flex items-center justify-between rounded-lg border p-3"
-                >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">{log.phoneNumber}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {log.message}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <Badge
-                      variant={
-                        log.status === 'delivered'
-                          ? 'default'
-                          : log.status === 'sent'
-                            ? 'secondary'
-                            : log.status === 'failed'
-                              ? 'destructive'
-                              : 'outline'
-                      }
+            <TooltipProvider>
+              <div className="space-y-3">
+                {smsLogs.map((log) => {
+                  const statusConfig = STATUS_CONFIG[log.status as SMSStatus] || STATUS_CONFIG.pending
+                  const StatusIcon = statusConfig.icon
+                  const hasError = log.status === 'failed' || log.status === 'undelivered'
+                  const errorMessage = log.error || log.twilioErrorMessage
+
+                  return (
+                    <div
+                      key={log.id}
+                      className="flex items-center justify-between rounded-lg border p-3"
                     >
-                      {log.status}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {log.sentAt
-                        ? format(log.sentAt, 'MMM d, h:mm a')
-                        : format(log.createdAt, 'MMM d, h:mm a')}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                      <div className="space-y-1 flex-1 min-w-0">
+                        <p className="text-sm font-medium">{log.phoneNumber}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          {log.message}
+                        </p>
+                        {hasError && errorMessage && (
+                          <p className="text-xs text-red-500 line-clamp-1">
+                            {errorMessage}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right flex-shrink-0 ml-4">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="inline-flex items-center gap-1.5">
+                              <StatusIcon className={`h-4 w-4 ${statusConfig.color} ${log.status === 'sending' ? 'animate-spin' : ''}`} />
+                              <Badge variant={statusConfig.variant}>
+                                {statusConfig.label}
+                              </Badge>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {log.status === 'delivered' && log.deliveredAt
+                                ? `Delivered at ${format(log.deliveredAt, 'MMM d, h:mm a')}`
+                                : log.status === 'sent'
+                                  ? 'Sent to carrier, awaiting delivery confirmation'
+                                  : log.status === 'failed' || log.status === 'undelivered'
+                                    ? errorMessage || 'Delivery failed'
+                                    : statusConfig.label
+                              }
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {log.sentAt
+                            ? format(log.sentAt, 'MMM d, h:mm a')
+                            : format(log.createdAt, 'MMM d, h:mm a')}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </TooltipProvider>
           )}
         </CardContent>
       </Card>
