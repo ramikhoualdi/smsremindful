@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
           <li><strong>Appointment data:</strong> Synced appointments are retained while your account is active</li>
         </ul>
         <p className="mt-3">
-          You may request deletion of your data at any time by contacting us at hey@smsremindful.com.
+          You may request deletion of your data at any time by contacting us at hey@getsmsremindful.com.
           Upon account deletion, we will delete your personal data within 30 days, except where retention
           is required by law.
         </p>
@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
           <li>Cancel your subscription and close your account</li>
         </ul>
         <p className="mt-3">
-          To exercise these rights, contact us at hey@smsremindful.com.
+          To exercise these rights, contact us at hey@getsmsremindful.com.
         </p>
       </Section>
 
@@ -240,7 +240,7 @@ export default function PrivacyPolicyPage() {
           <li>The right to non-discrimination for exercising your privacy rights</li>
         </ul>
         <p className="mt-3">
-          To exercise these rights, contact us at hey@smsremindful.com.
+          To exercise these rights, contact us at hey@getsmsremindful.com.
         </p>
       </Section>
 
@@ -261,13 +261,13 @@ export default function PrivacyPolicyPage() {
       <Section title="17. Contact Us">
         <p>
           If you have questions about this Privacy Policy or our data practices, please contact us at:{' '}
-          <a href="mailto:hey@smsremindful.com" className="text-primary underline hover:no-underline">
-            hey@smsremindful.com
+          <a href="mailto:hey@getsmsremindful.com" className="text-primary underline hover:no-underline">
+            hey@getsmsremindful.com
           </a>
         </p>
         <p className="mt-3 text-sm">
           SaaSyful LLC<br />
-          Email: hey@smsremindful.com
+          Email: hey@getsmsremindful.com
         </p>
       </Section>
 

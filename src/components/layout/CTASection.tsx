@@ -72,10 +72,10 @@ export function CTASection({
           <p className="text-sm mt-6 opacity-75">
             Questions? Email us at{' '}
             <a
-              href="mailto:hey@smsremindful.com"
+              href="mailto:hey@getsmsremindful.com"
               className="underline hover:no-underline"
             >
-              hey@smsremindful.com
+              hey@getsmsremindful.com
             </a>
           </p>
         )}

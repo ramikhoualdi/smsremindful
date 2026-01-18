@@ -92,10 +92,10 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">
             Questions?{' '}
             <a
-              href="mailto:hey@smsremindful.com"
+              href="mailto:hey@getsmsremindful.com"
               className="underline hover:text-foreground"
             >
-              hey@smsremindful.com
+              hey@getsmsremindful.com
             </a>
           </p>
         </div>

@@ -203,10 +203,10 @@ export default function FAQPage() {
               Everything you need to know about SMS Remindful. Can&apos;t find
               what you&apos;re looking for? Email us at{' '}
               <a
-                href="mailto:hey@smsremindful.com"
+                href="mailto:hey@getsmsremindful.com"
                 className="underline hover:text-foreground"
               >
-                hey@smsremindful.com
+                hey@getsmsremindful.com
               </a>
             </p>
           </div>
@@ -247,7 +247,7 @@ export default function FAQPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild>
-                <a href="mailto:hey@smsremindful.com">Email Support</a>
+                <a href="mailto:hey@getsmsremindful.com">Email Support</a>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/sign-up">Start Free Trial</Link>

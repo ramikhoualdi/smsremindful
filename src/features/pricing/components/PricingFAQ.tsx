@@ -153,8 +153,8 @@ export function PricingFAQ() {
         {/* Contact */}
         <p className="mt-12 text-center text-sm text-muted-foreground">
           Still have questions? Email us at{' '}
-          <a href="mailto:hey@smsremindful.com" className="underline hover:text-foreground">
-            hey@smsremindful.com
+          <a href="mailto:hey@getsmsremindful.com" className="underline hover:text-foreground">
+            hey@getsmsremindful.com
           </a>
         </p>
       </div>
