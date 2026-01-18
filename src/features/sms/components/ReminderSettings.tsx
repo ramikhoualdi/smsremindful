@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { CheckCircle2, XCircle, Clock, Send, AlertCircle, Loader2 } from 'lucide-react'
+import { CheckCircle2, XCircle, Clock, Send, AlertCircle, Loader2, RefreshCw } from 'lucide-react'
 import { REMINDER_TIMINGS, type ReminderSchedule, type ReminderTiming, type SMSStatus } from '../types'
 import type { Template } from '@/features/templates/types'
 import type { SMSLog } from '../types'
@@ -55,6 +55,13 @@ export function ReminderSettings({
   const [schedules, setSchedules] = useState(initialSchedules)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isRefreshing, startRefresh] = useTransition()
+
+  const handleRefresh = () => {
+    startRefresh(() => {
+      router.refresh()
+    })
+  }
 
   // Form state for new schedule
   const [newTiming, setNewTiming] = useState<ReminderTiming>('1_day')
@@ -283,8 +290,21 @@ export function ReminderSettings({
 
       <Card>
         <CardHeader>
-          <CardTitle>Sent Reminders</CardTitle>
-          <CardDescription>History of reminders sent to patients</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Sent Reminders</CardTitle>
+              <CardDescription>History of reminders sent to patients</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {smsLogs.length === 0 ? (
@@ -293,7 +313,7 @@ export function ReminderSettings({
             </p>
           ) : (
             <TooltipProvider>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                 {smsLogs.map((log) => {
                   const statusConfig = STATUS_CONFIG[log.status as SMSStatus] || STATUS_CONFIG.pending
                   const StatusIcon = statusConfig.icon
